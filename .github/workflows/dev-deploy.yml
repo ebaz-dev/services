@@ -1,0 +1,74 @@
+name: Development Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "**"
+      - "!.github/**"
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.changes.outputs.services }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - id: changes
+        run: |
+          SERVICES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep "^[^/]*/" | grep -v "^core/" | grep -v "^.github/" | cut -d/ -f1 | sort -u)
+          echo "services=$(echo $SERVICES | jq -R -s -c 'split(" ")')" >> $GITHUB_OUTPUT
+
+  build-and-deploy:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.services != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.detect-changes.outputs.services) }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Core
+        run: |
+          cd core
+          npm install
+          npm run build
+          npm link
+
+      - name: Install Service Dependencies
+        run: |
+          cd ${{ matrix.service }}
+          npm link @ezdev/core
+          npm install
+
+      - name: Log in to Docker Hub
+        run: echo '${{ secrets.DOCKER_PASSWORD }}' | docker login -u '${{ secrets.DOCKER_USERNAME }}' --password-stdin
+
+      - name: Build and Push Docker image
+        run: |
+          SERVICE=$(echo "${{ matrix.service }}" | tr -d '\n\r')
+          IMAGE_TAG="${{ secrets.DOCKER_USERNAME }}/${SERVICE}:${{ github.sha }}"
+
+          cd ${{ matrix.service }}
+          docker build -t ${IMAGE_TAG} .
+          docker push ${IMAGE_TAG}
+
+      - name: Deploy to Kubernetes Dev
+        run: |
+          SERVICE=$(echo "${{ matrix.service }}" | tr -d '\n\r')
+
+          kubectl config set-cluster kubernetes --server=${{ secrets.K8S_SERVER_DEV }}
+          kubectl config set clusters.kubernetes.certificate-authority-data ${{ secrets.K8S_CERT_DEV }}
+          kubectl config set-credentials kubernetes-admin --token=${{ secrets.K8S_TOKEN_DEV }}
+          kubectl config set-context kubernetes-admin@kubernetes --cluster=kubernetes --user=kubernetes-admin
+          kubectl config use-context kubernetes-admin@kubernetes
+
+          kubectl apply -f ./${SERVICE}/k8s/dev/auth-depl.yaml
+          kubectl set image deployment/${SERVICE}-depl ${SERVICE}=${{ secrets.DOCKER_USERNAME }}/${SERVICE}:${{ github.sha }}
+          kubectl rollout status deployment/${SERVICE}-depl

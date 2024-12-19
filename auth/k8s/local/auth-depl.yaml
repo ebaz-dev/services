@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec: 
+      containers:
+        - name: auth
+          image: 1stnano/auth:latest
+          env:
+            - name: MONGO_URI
+              value: 'mongodb://ebaz-dev:774CPXo65J8i@160.187.40.17:27017,160.187.40.18:27017/ebaz-dev?replicaSet=rs0&authSource=ebaz-dev'
+            - name: JWT_KEY
+              value: '279112db517a6fadbfbb53500ee5e142a9036f1c972739e895c0d3ff7aa84af3'
+            - name: NATS_URL
+              value: 'http://114.129.42.59:4222'
+            - name: NATS_CLUSTER_ID
+              value: 'ebazaar_dev'
+            - name: NATS_USER
+              value: 'nats_dev'
+            - name: NATS_PASS
+              value: 'NaTs@Dev$EBaz'
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name 
+            - name: PORT
+              value: '3000'
+            - name: NODE_ENV
+              value: 'development'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-srv
+spec:
+  selector:
+    app: auth
+  ports:
+    - name: auth
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

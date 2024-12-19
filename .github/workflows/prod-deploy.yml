@@ -1,0 +1,133 @@
+name: Production Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "SHA of version to promote from dev"
+        required: true
+
+jobs:
+  detect-services:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.get-services.outputs.services }}
+    steps:
+      - id: get-services
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const workflow_runs = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.name,
+              workflow_id: 'dev-deploy.yml',
+              sha: '${{ inputs.version }}'
+            });
+
+            const run = workflow_runs.data.workflow_runs[0];
+            if (!run) {
+              core.setFailed('No dev deployment found for this SHA');
+              return;
+            }
+
+            const jobs = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.name,
+              run_id: run.id
+            });
+
+            // Find build-and-deploy jobs and extract services from matrix
+            const deployedServices = jobs.data.jobs
+              .filter(job => job.name.startsWith('build-and-deploy ('))
+              .map(job => {
+                const match = job.name.match(/build-and-deploy \((.*?)\)/);
+                return match ? match[1] : null;
+              })
+              .filter(Boolean);
+
+            core.setOutput('services', JSON.stringify(deployedServices));
+
+  deploy:
+    needs: detect-services
+    if: needs.detect-services.outputs.services != '[]'
+    runs-on: ubuntu-latest
+    environment: prod
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.detect-services.outputs.services) }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy to Kubernetes Prod
+        run: |
+          SERVICE=$(echo "${{ matrix.service }}" | tr -d '\n\r')
+
+          kubectl config set-cluster kubernetes --server=${{ secrets.K8S_SERVER_PROD }}
+          kubectl config set clusters.kubernetes.certificate-authority-data ${{ secrets.K8S_CERT_PROD }}
+          kubectl config set-credentials kubernetes-admin --token=${{ secrets.K8S_TOKEN_PROD }}
+          kubectl config set-context kubernetes-admin@kubernetes --cluster=kubernetes --user=kubernetes-admin
+          kubectl config use-context kubernetes-admin@kubernetes
+
+          kubectl apply -f ./${SERVICE}/k8s/prod/auth-depl.yaml
+          kubectl set image deployment/${SERVICE}-depl ${SERVICE}=${{ secrets.DOCKER_USERNAME }}/${SERVICE}:${{ inputs.version }}
+          kubectl rollout status deployment/${SERVICE}-depl
+
+      - name: Verify Deployment
+        run: |
+          SERVICE=$(echo "${{ matrix.service }}" | tr -d '\n\r')
+          kubectl get pods | grep ${SERVICE}
+          kubectl get service ${SERVICE}-srv
+
+      - name: Verify Dev Deployment Status
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const service = '${{ matrix.service }}';
+            const devDeployment = await github.rest.deployments.listDeployments({
+              owner: context.repo.owner,
+              repo: context.repo.name,
+              sha: '${{ inputs.version }}',
+              environment: 'dev',
+              task: service
+            });
+
+            if (!devDeployment.data[0]?.status === 'success') {
+              core.setFailed(`Service ${service} was not successfully deployed to dev`);
+            }
+
+      - name: Create Production Deployment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.deployments.create({
+              owner: context.repo.owner,
+              repo: context.repo.name,
+              ref: '${{ inputs.version }}',
+              environment: 'production',
+              task: '${{ matrix.service }}',
+              auto_merge: false
+            });
+
+      - name: Store Rollback Info
+        run: |
+          SERVICE=${{ matrix.service }}
+          PREV_VERSION=$(kubectl get deployment/${SERVICE}-depl -o=jsonpath='{$.spec.template.spec.containers[0].image}')
+          echo "Previous version was: $PREV_VERSION"
+          echo "PREV_VERSION=$PREV_VERSION" >> $GITHUB_ENV
+
+      - name: Notify Deployment Status
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const status = '${{ job.status }}';
+            const service = '${{ matrix.service }}';
+            const version = '${{ inputs.version }}';
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.name,
+              issue_number: context.issue.number,
+              body: `Production deployment of ${service} ${status} for version ${version}`
+            });

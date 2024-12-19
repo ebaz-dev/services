@@ -1,0 +1,68 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - prod
+    paths:
+      - "**"
+      - "!.github/**"
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.changes.outputs.services }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - id: changes
+        run: |
+          SERVICES=$(git diff --name-only origin/${{ github.base_ref }} HEAD | grep "^[^/]*/" | grep -v "^core/" | grep -v "^.github/" | cut -d/ -f1 | sort -u)
+          echo "services=$(echo $SERVICES | jq -R -s -c 'split(" ")')" >> $GITHUB_OUTPUT
+
+  test-and-lint:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.services != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.detect-changes.outputs.services) }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      # Build core first
+      - name: Setup Core
+        run: |
+          cd core
+          npm install
+          npm run build
+          npm link
+
+      - name: Install Service Dependencies
+        run: |
+          cd ${{ matrix.service }}
+          npm link @ezdev/core
+          npm install
+
+      - name: Run TypeScript checks
+        run: |
+          cd ${{ matrix.service }}
+          npm run lint
+
+      - name: Run Tests
+        run: |
+          cd ${{ matrix.service }}
+          npm run test:ci
+        env:
+          NODE_ENV: test
+          JWT_KEY: qemqekqenjkqneqhje
