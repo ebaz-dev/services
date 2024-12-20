@@ -132,6 +132,7 @@ jobs:
       contents: read
       deployments: write
       issues: write
+      actions: read
     strategy:
       matrix:
         service: ${{ fromJson(needs.detect-services.outputs.services) }}
@@ -162,6 +163,7 @@ jobs:
       - name: Verify Dev Deployment Status
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             try {
               const service = '${{ matrix.service }}';
