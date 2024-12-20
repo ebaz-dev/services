@@ -20,8 +20,14 @@ jobs:
 
       - id: changes
         run: |
-          SERVICES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep "^[^/]*/" | grep -v "^core/" | grep -v "^.github/" | cut -d/ -f1 | tr -d '\n\r' | sort -u)
-          echo "services=$(echo $SERVICES | jq -R -s -c 'split(" ")')" >> $GITHUB_OUTPUT
+          SERVICES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | \
+            grep "^[^/]*/" | \
+            grep -v "^core/" | \
+            grep -v "^.github/" | \
+            cut -d/ -f1 | \
+            sort -u | \
+            xargs)
+          echo "services=$(echo "$SERVICES" | jq -R -s -c 'split(" ")')" >> $GITHUB_OUTPUT
 
   build-and-deploy:
     needs: detect-changes

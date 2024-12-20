@@ -97,7 +97,7 @@ jobs:
                 .filter(job => job.name.startsWith('build-and-deploy ('))
                 .map(job => {
                   const match = job.name.match(/build-and-deploy \((.*?)\)?/);
-                  return match ? match[1].trim() : null;
+                  return match ? match[1].trim().replace(/[\n\r]/g, '') : null;
                 })
                 .filter(Boolean);
               
