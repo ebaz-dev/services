@@ -12,8 +12,6 @@ jest.mock("../nats-wrapper");
 
 let mongo: MongoMemoryServer;
 beforeAll(async () => {
-  console.log("Test environment setup - NODE_ENV:", process.env.NODE_ENV);
-
   process.env.JWT_KEY = "asdfasdf";
   process.env.NODE_ENV = "test";
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -21,10 +19,7 @@ beforeAll(async () => {
   mongo = await MongoMemoryServer.create();
   const mongoUri = mongo.getUri();
 
-  await mongoose.connect(mongoUri, {
-    autoIndex: true,
-    serverSelectionTimeoutMS: 5000,
-  });
+  await mongoose.connect(mongoUri);
 });
 
 beforeEach(async () => {
@@ -56,57 +51,35 @@ global.signin = async () => {
   const deviceType = "web";
   const deviceName = "jest test";
 
-  // Register user with error handling
-  const signupResponse = await request(app)
+  const response = await request(app)
     .post(`${global.apiPrefix}/signup`)
     .send({
       email,
       password,
-    });
+    })
+    .expect(201);
 
-  if (!signupResponse.body.confirmationCode) {
-    throw new Error("No confirmation code received from signup");
-  }
-
-  // Confirm user with error handling
-  const confirmResponse = await request(app)
+  await request(app)
     .post(`${global.apiPrefix}/confirm-user`)
     .send({
-      email,
-      confirmationCode: signupResponse.body.confirmationCode,
-    });
+      email: email,
+      confirmationCode: response.body.confirmationCode,
+    })
+    .expect(200);
 
-  if (confirmResponse.status !== 200) {
-    throw new Error(`User confirmation failed: ${confirmResponse.status}`);
-  }
-
-  // Sign in user with error handling
-  const signInResponse = await request(app)
-    .post(`${global.apiPrefix}/signin`)
+  const signedUser = await request(app)
+    .post(`${global.apiPrefix}/signIn`)
     .send({
       email,
       password,
       deviceType,
       deviceName,
-    });
+    })
+    .expect(200);
 
-  if (signInResponse.status !== 200) {
-    throw new Error(`Sign in failed: ${signInResponse.status}`);
-  }
+  const cookie = signedUser.get("Set-Cookie");
 
-  const cookie = signInResponse.get("Set-Cookie");
-  if (!cookie) {
-    console.error("Sign in response:", signInResponse.body);
-    throw new Error("Failed to get authentication cookie");
-  }
-
-  if (!signInResponse.get("Set-Cookie")) {
-    console.log("Debug - Sign in response headers:", signInResponse.headers);
-    console.log("Debug - Sign in response body:", signInResponse.body);
-    console.log("Debug - NODE_ENV:", process.env.NODE_ENV);
-  }
-
-  return cookie;
+  return cookie ?? [];
 };
 
 global.apiPrefix = "/api/v1/users";
