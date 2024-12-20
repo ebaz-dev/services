@@ -128,6 +128,10 @@ jobs:
     if: fromJson(needs.detect-services.outputs.services) != '[]'
     runs-on: ubuntu-latest
     environment: prod
+    permissions:
+      contents: read
+      deployments: write
+      issues: write
     strategy:
       matrix:
         service: ${{ fromJson(needs.detect-services.outputs.services) }}
@@ -159,31 +163,46 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const service = '${{ matrix.service }}';
-            const devDeployment = await github.rest.deployments.listDeployments({
-              owner: context.repo.owner,
-              repo: context.repo.name,
-              sha: '${{ inputs.version }}',
-              environment: 'dev',
-              task: service
-            });
+            try {
+              const service = '${{ matrix.service }}';
+              const { data: deployments } = await github.rest.actions.listWorkflowRuns({
+                owner: context.repo.owner,
+                repo: context.repo.name,
+                workflow_id: 'dev-deploy.yml',
+                status: 'completed',
+                conclusion: 'success',
+                branch: 'main'
+              });
 
-            if (!devDeployment.data[0]?.status === 'success') {
-              core.setFailed(`Service ${service} was not successfully deployed to dev`);
+              const devDeployment = deployments.workflow_runs.find(run => 
+                run.head_sha === '${{ inputs.version }}'
+              );
+
+              if (!devDeployment) {
+                core.setFailed(`Service ${service} was not successfully deployed to dev`);
+              }
+            } catch (error) {
+              console.error('Error checking deployment:', error);
+              core.setFailed(error.message);
             }
 
       - name: Create Production Deployment
         uses: actions/github-script@v6
         with:
           script: |
-            await github.rest.deployments.create({
-              owner: context.repo.owner,
-              repo: context.repo.name,
-              ref: '${{ inputs.version }}',
-              environment: 'production',
-              task: '${{ matrix.service }}',
-              auto_merge: false
-            });
+            try {
+              await github.rest.repos.createDeployment({
+                owner: context.repo.owner,
+                repo: context.repo.name,
+                ref: '${{ inputs.version }}',
+                environment: 'production',
+                task: '${{ matrix.service }}',
+                auto_merge: false
+              });
+            } catch (error) {
+              console.error('Error creating deployment:', error);
+              core.setFailed(error.message);
+            }
 
       - name: Store Rollback Info
         run: |
@@ -197,13 +216,20 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const status = '${{ job.status }}';
-            const service = '${{ matrix.service }}';
-            const version = '${{ inputs.version }}';
-
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.name,
-              issue_number: context.issue.number,
-              body: `Production deployment of ${service} ${status} for version ${version}`
-            });
+            try {
+              const status = '${{ job.status }}';
+              const service = '${{ matrix.service }}';
+              const version = '${{ inputs.version }}';
+              
+              if (context.eventName === 'workflow_dispatch') {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.name,
+                  issue_number: context.payload.inputs.issue_number || context.runId,
+                  body: `Production deployment of ${service} ${status} for version ${version}`
+                });
+              }
+            } catch (error) {
+              console.error('Error creating comment:', error);
+              console.log('Failed to create comment:', error.message);
+            }
