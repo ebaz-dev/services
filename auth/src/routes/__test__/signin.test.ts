@@ -59,7 +59,7 @@ it("responds with a cookie when given valid credentials and user confirmed", asy
     })
     .expect(200);
 
-  console.log("BODY ----", response.body);
+  console.log("BODY ----", response);
 
   expect(response.get("Set-Cookie")).toBeDefined();
 });
