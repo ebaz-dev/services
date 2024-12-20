@@ -54,6 +54,11 @@ jobs:
           npm link @ezdev/core
           npm install
 
+      - name: Run Lint
+        run: |
+          cd ${{ matrix.service }}
+          npm run lint
+
       - name: Run Tests
         run: |
           cd ${{ matrix.service }}
