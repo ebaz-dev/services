@@ -10,6 +10,8 @@ on:
 jobs:
   detect-services:
     runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.get-services.outputs.services }}
     permissions:
       contents: read
       actions: read
@@ -34,6 +36,9 @@ jobs:
                 sha: '${{ inputs.version }}'
               });
 
+              // Initialize empty array for services
+              let deployedServices = [];
+
               // First check if the commit exists
               const { data: commit } = await github.rest.repos.getCommit({
                 owner: owner,
@@ -53,7 +58,8 @@ jobs:
               
               const devWorkflow = workflows.workflows.find(w => w.path === '.github/workflows/dev-deploy.yml');
               if (!devWorkflow) {
-                core.setFailed('dev-deploy.yml workflow not found');
+                console.log('dev-deploy.yml workflow not found');
+                core.setOutput('services', '[]');
                 return;
               }
               
@@ -68,7 +74,8 @@ jobs:
               
               const run = workflow_runs.data.workflow_runs[0];
               if (!run) {
-                core.setFailed('No dev deployment found for this SHA');
+                console.log('No dev deployment found for this SHA');
+                core.setOutput('services', '[]');
                 return;
               }
 
@@ -80,7 +87,13 @@ jobs:
                 run_id: run.id
               });
               
-              const deployedServices = jobs.data.jobs
+              console.log('All jobs:', jobs.data.jobs.map(j => ({
+                name: j.name,
+                status: j.status,
+                conclusion: j.conclusion
+              })));
+              
+              deployedServices = jobs.data.jobs
                 .filter(job => job.name.startsWith('build-and-deploy ('))
                 .map(job => {
                   const match = job.name.match(/build-and-deploy \((.*?)\)/);
@@ -89,15 +102,23 @@ jobs:
                 .filter(Boolean);
               
               console.log('Detected services:', deployedServices);
+              
+              if (deployedServices.length === 0) {
+                console.log('No build-and-deploy jobs found in the workflow run');
+                // List all job names to help debug
+                console.log('Available job names:', jobs.data.jobs.map(j => j.name));
+              }
+              
               core.setOutput('services', JSON.stringify(deployedServices));
             } catch (error) {
               console.error('Error:', error);
+              core.setOutput('services', '[]');
               core.setFailed(error.message);
             }
 
   deploy:
     needs: detect-services
-    if: needs.detect-services.outputs.services != '[]'
+    if: fromJson(needs.detect-services.outputs.services) != '[]'
     runs-on: ubuntu-latest
     environment: prod
     strategy:
