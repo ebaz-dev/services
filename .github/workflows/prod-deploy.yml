@@ -10,6 +10,11 @@ on:
 jobs:
   detect-services:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      deployments: write
+      issues: write
     outputs:
       services: ${{ steps.get-services.outputs.services }}
     steps:
