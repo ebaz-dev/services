@@ -56,7 +56,7 @@ const start = async () => {
       heartbeatFrequencyMS: 10000,
     };
 
-    // Connect to MongoDB with options
+    // Connect to MongoDB with options for production
     await mongoose.connect(process.env.MONGO_URI!, mongooseOptions);
     console.log("Connected to MongoDB");
 
