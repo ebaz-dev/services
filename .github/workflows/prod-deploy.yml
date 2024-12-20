@@ -17,35 +17,51 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const workflow_runs = await github.rest.actions.listWorkflowRuns({
-              owner: context.repo.owner,
-              repo: context.repo.name,
-              workflow_id: 'dev-deploy.yml',
-              sha: '${{ inputs.version }}'
-            });
+            try {
+              // First, try to get the workflow ID
+              const { data: workflow } = await github.rest.actions.getWorkflowByFileName({
+                owner: context.repo.owner,
+                repo: context.repo.name,
+                path: 'dev-deploy.yml'
+              });
 
-            const run = workflow_runs.data.workflow_runs[0];
-            if (!run) {
-              core.setFailed('No dev deployment found for this SHA');
-              return;
+              const workflow_runs = await github.rest.actions.listWorkflowRuns({
+                owner: context.repo.owner,
+                repo: context.repo.name,
+                workflow_id: workflow.id,  // Use workflow ID instead of filename
+                sha: '${{ inputs.version }}'
+              });
+
+              console.log('Found workflow runs:', workflow_runs.data);
+              
+              const run = workflow_runs.data.workflow_runs[0];
+              if (!run) {
+                core.setFailed('No dev deployment found for this SHA');
+                return;
+              }
+
+              console.log('Using workflow run:', run.id);
+              
+              const jobs = await github.rest.actions.listJobsForWorkflowRun({
+                owner: context.repo.owner,
+                repo: context.repo.name,
+                run_id: run.id
+              });
+              
+              const deployedServices = jobs.data.jobs
+                .filter(job => job.name.startsWith('build-and-deploy ('))
+                .map(job => {
+                  const match = job.name.match(/build-and-deploy \((.*?)\)/);
+                  return match ? match[1] : null;
+                })
+                .filter(Boolean);
+              
+              console.log('Detected services:', deployedServices);
+              core.setOutput('services', JSON.stringify(deployedServices));
+            } catch (error) {
+              console.error('Error:', error);
+              core.setFailed(error.message);
             }
-
-            const jobs = await github.rest.actions.listJobsForWorkflowRun({
-              owner: context.repo.owner,
-              repo: context.repo.name,
-              run_id: run.id
-            });
-
-            // Find build-and-deploy jobs and extract services from matrix
-            const deployedServices = jobs.data.jobs
-              .filter(job => job.name.startsWith('build-and-deploy ('))
-              .map(job => {
-                const match = job.name.match(/build-and-deploy \((.*?)\)/);
-                return match ? match[1] : null;
-              })
-              .filter(Boolean);
-
-            core.setOutput('services', JSON.stringify(deployedServices));
 
   deploy:
     needs: detect-services
