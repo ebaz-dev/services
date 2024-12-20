@@ -65,6 +65,9 @@ jobs:
           npm run lint
 
       - name: Run Tests
+        env:
+          JWT_KEY: test_jwt_key
+          NODE_ENV: test
         run: |
           cd ${{ matrix.service }}
           npm run test:ci
