@@ -14,10 +14,7 @@
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
       "./src/test/setup.ts"
-    ],
-    "testTimeout": 30000,
-    "forceExit": true,
-    "detectOpenHandles": true
+    ]
   },
   "keywords": [],
   "author": "",

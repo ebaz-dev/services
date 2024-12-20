@@ -10,7 +10,7 @@ on:
 
 jobs:
   detect-changes:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       services: ${{ steps.changes.outputs.services }}
     steps:
@@ -32,7 +32,7 @@ jobs:
   pull-request-check:
     needs: detect-changes
     if: needs.detect-changes.outputs.services != '[]'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         service: ${{ fromJson(needs.detect-changes.outputs.services) }}
@@ -51,8 +51,7 @@ jobs:
       - name: Install Service Dependencies
         run: |
           cd ${{ matrix.service }}
-          npm link @ezdev/core
-          npm install
+          npm link @ez
 
       - name: Run Lint
         run: |
