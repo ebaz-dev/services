@@ -25,13 +25,14 @@ const apiPrefix = "/api/v1/users";
 const app = express();
 app.set("trust proxy", true);
 app.use(json());
-app.use(
-  cookieSession({
-    signed: true,
-    secure: process.env.NODE_ENV !== "test",
-    keys: [process.env.JWT_KEY!],
-  })
-);
+
+const cookieOptions = {
+  signed: true,
+  secure: process.env.NODE_ENV !== "test",
+  keys: [process.env.JWT_KEY!],
+};
+console.log("cookieOptions", cookieOptions);
+app.use(cookieSession(cookieOptions));
 
 app.use(currentUser);
 process.env.NODE_ENV !== "test" && app.use(accessLogger("auth"));
