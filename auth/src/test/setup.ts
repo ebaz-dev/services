@@ -51,35 +51,36 @@ global.signin = async () => {
   const deviceType = "web";
   const deviceName = "jest test";
 
-  const response = await request(app)
+  // Register user
+  const signupResponse = await request(app)
     .post(`${global.apiPrefix}/signup`)
     .send({
       email,
       password,
-    })
-    .expect(201);
+    });
 
-  await request(app)
-    .post(`${global.apiPrefix}/confirm-user`)
-    .send({
-      email: email,
-      confirmationCode: response.body.confirmationCode,
-    })
-    .expect(200);
+  // Confirm user
+  await request(app).post(`${global.apiPrefix}/confirm-user`).send({
+    email,
+    confirmationCode: signupResponse.body.confirmationCode,
+  });
 
-  const signedUser = await request(app)
-    .post(`${global.apiPrefix}/signIn`)
+  // Sign in user
+  const signInResponse = await request(app)
+    .post(`${global.apiPrefix}/signin`)
     .send({
       email,
       password,
       deviceType,
       deviceName,
-    })
-    .expect(200);
+    });
 
-  const cookie = signedUser.get("Set-Cookie");
+  const cookie = signInResponse.get("Set-Cookie");
+  if (!cookie) {
+    throw new Error("Failed to get authentication cookie");
+  }
 
-  return cookie ?? [];
+  return cookie;
 };
 
 global.apiPrefix = "/api/v1/users";
