@@ -30,6 +30,7 @@ jobs:
     strategy:
       matrix:
         service: ${{ fromJson(needs.detect-changes.outputs.services) }}
+    name: build-and-deploy (${{ matrix.service }})
 
     steps:
       - uses: actions/checkout@v3
