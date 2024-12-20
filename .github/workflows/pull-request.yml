@@ -10,7 +10,7 @@ on:
 
 jobs:
   detect-changes:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       services: ${{ steps.changes.outputs.services }}
     steps:
@@ -32,7 +32,7 @@ jobs:
   pull-request-check:
     needs: detect-changes
     if: needs.detect-changes.outputs.services != '[]'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         service: ${{ fromJson(needs.detect-changes.outputs.services) }}
@@ -41,10 +41,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
       - name: Setup Core
         run: |
           cd core
-          npm install
+          npm ci
           npm run build
           npm link
 
@@ -52,9 +57,17 @@ jobs:
         run: |
           cd ${{ matrix.service }}
           npm link @ezdev/core
-          npm install
+          npm ci
 
-      - name: Run Tests
+      - name: Run Lint
         run: |
           cd ${{ matrix.service }}
-          npm test
+          npm run lint
+
+      - name: Run Tests
+        env:
+          JWT_KEY: test_jwt_key
+          NODE_ENV: test
+        run: |
+          cd ${{ matrix.service }}
+          npm run test:ci
