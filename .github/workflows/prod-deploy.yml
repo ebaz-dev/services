@@ -289,15 +289,27 @@ jobs:
                 version: version
               });
               
-              if (context.eventName === 'workflow_dispatch') {
-                await github.rest.issues.createComment({
-                  owner: owner,
-                  repo: repo,
-                  issue_number: context.payload.inputs.issue_number || context.runId,
-                  body: `Production deployment of ${service} ${status} for version ${version}`
-                });
-              }
+              // Create a new issue for the deployment status
+              const { data: issue } = await github.rest.issues.create({
+                owner: owner,
+                repo: repo,
+                title: `Production Deployment Status: ${service}`,
+                body: `
+                # Production Deployment Status
+                
+                - **Service**: ${service}
+                - **Status**: ${status}
+                - **Version**: ${version}
+                - **Deployment Time**: ${new Date().toISOString()}
+                
+                This is an automated deployment status notification.
+                `
+              });
+              
+              console.log('Created deployment status issue:', issue.html_url);
+              
             } catch (error) {
-              console.error('Error creating comment:', error);
-              console.log('Failed to create comment:', error.message);
+              console.error('Error creating deployment notification:', error);
+              // Don't fail the workflow for notification errors
+              console.log('Failed to create notification:', error.message);
             }
