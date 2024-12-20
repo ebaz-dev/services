@@ -18,17 +18,10 @@ jobs:
         with:
           script: |
             try {
-              // First, try to get the workflow ID
-              const { data: workflow } = await github.rest.actions.getWorkflowByFileName({
-                owner: context.repo.owner,
-                repo: context.repo.name,
-                path: 'dev-deploy.yml'
-              });
-
               const workflow_runs = await github.rest.actions.listWorkflowRuns({
                 owner: context.repo.owner,
                 repo: context.repo.name,
-                workflow_id: workflow.id,  // Use workflow ID instead of filename
+                workflow_id: 'dev-deploy.yml',  // Use filename directly
                 sha: '${{ inputs.version }}'
               });
 
