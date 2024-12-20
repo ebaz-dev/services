@@ -94,14 +94,21 @@ jobs:
               })));
               
               deployedServices = jobs.data.jobs
-                .filter(job => job.name.startsWith('build-and-deploy ('))
+                .filter(job => job.name.includes('build-and-deploy'))
                 .map(job => {
-                  const match = job.name.match(/build-and-deploy \((.*?)\)?/);
-                  return match ? match[1].trim().replace(/[\n\r]/g, '') : null;
+                  console.log('Processing job name:', job.name);
+                  // More aggressive cleanup and matching
+                  const cleanName = job.name.replace(/[\n\r\s]+/g, ' ').trim();
+                  console.log('Cleaned job name:', cleanName);
+                  const match = cleanName.match(/build-and-deploy \(([^)]+)\)/);
+                  console.log('Match result:', match);
+                  return match ? match[1].trim() : null;
                 })
                 .filter(Boolean);
               
-              console.log('Detected services:', deployedServices);
+              console.log('Raw job names:', jobs.data.jobs.map(j => j.name));
+              console.log('After filter:', jobs.data.jobs.filter(job => job.name.includes('build-and-deploy')).map(j => j.name));
+              console.log('Final detected services:', deployedServices);
               
               if (deployedServices.length === 0) {
                 console.log('No build-and-deploy jobs found in the workflow run');
