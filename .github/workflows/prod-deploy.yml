@@ -23,13 +23,34 @@ jobs:
         with:
           script: |
             try {
+              // First check if the commit exists
+              const { data: commit } = await github.rest.repos.getCommit({
+                owner: context.repo.owner,
+                repo: context.repo.name,
+                ref: '${{ inputs.version }}'
+              });
+              
+              console.log('Checking commit:', commit.sha);
+              
+              // Then get workflow runs
+              const { data: workflows } = await github.rest.actions.listRepoWorkflows({
+                owner: context.repo.owner,
+                repo: context.repo.name
+              });
+              
+              const devWorkflow = workflows.workflows.find(w => w.path === '.github/workflows/dev-deploy.yml');
+              if (!devWorkflow) {
+                core.setFailed('dev-deploy.yml workflow not found');
+                return;
+              }
+              
               const workflow_runs = await github.rest.actions.listWorkflowRuns({
                 owner: context.repo.owner,
                 repo: context.repo.name,
-                workflow_id: 'dev-deploy.yml',  // Use filename directly
+                workflow_id: devWorkflow.id,
                 sha: '${{ inputs.version }}'
               });
-
+              
               console.log('Found workflow runs:', workflow_runs.data);
               
               const run = workflow_runs.data.workflow_runs[0];
