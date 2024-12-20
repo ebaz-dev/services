@@ -43,7 +43,7 @@ const start = async () => {
   }
 
   try {
-    // MongoDB Connection Options for production
+    // MongoDB Connection Options
     const mongooseOptions: mongoose.ConnectOptions = {
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
