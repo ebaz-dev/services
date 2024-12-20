@@ -96,8 +96,8 @@ jobs:
               deployedServices = jobs.data.jobs
                 .filter(job => job.name.startsWith('build-and-deploy ('))
                 .map(job => {
-                  const match = job.name.match(/build-and-deploy \((.*?)\)/);
-                  return match ? match[1] : null;
+                  const match = job.name.match(/build-and-deploy \((.*?)\)?/);
+                  return match ? match[1].trim() : null;
                 })
                 .filter(Boolean);
               
