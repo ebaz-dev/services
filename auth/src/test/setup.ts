@@ -12,6 +12,8 @@ jest.mock("../nats-wrapper");
 
 let mongo: MongoMemoryServer;
 beforeAll(async () => {
+  console.log("Test environment setup - NODE_ENV:", process.env.NODE_ENV);
+
   process.env.JWT_KEY = "asdfasdf";
   process.env.NODE_ENV = "test";
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -96,6 +98,12 @@ global.signin = async () => {
   if (!cookie) {
     console.error("Sign in response:", signInResponse.body);
     throw new Error("Failed to get authentication cookie");
+  }
+
+  if (!signInResponse.get("Set-Cookie")) {
+    console.log("Debug - Sign in response headers:", signInResponse.headers);
+    console.log("Debug - Sign in response body:", signInResponse.body);
+    console.log("Debug - NODE_ENV:", process.env.NODE_ENV);
   }
 
   return cookie;

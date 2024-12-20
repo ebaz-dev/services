@@ -57,4 +57,4 @@ jobs:
       - name: Run Tests
         run: |
           cd ${{ matrix.service }}
-          npm test
+          npm test:ci
