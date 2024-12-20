@@ -41,17 +41,23 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
       - name: Setup Core
         run: |
           cd core
-          npm install
+          npm ci
           npm run build
           npm link
 
       - name: Install Service Dependencies
         run: |
           cd ${{ matrix.service }}
-          npm link @ez
+          npm link @ezdev/core
+          npm ci
 
       - name: Run Lint
         run: |
