@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node-dev --poll src/index.ts",
-    "test": "jest --watchAll --no-cache --detectOpenHandles",
+    "test": "jest --watchAll --no-cache --detectOpenHandles --forceExit",
     "test:ci": "jest --ci --forceExit --detectOpenHandles --maxWorkers=1",
     "lint": "tsc --noEmit",
     "build": "tsc -p ./tsconfig.json"
@@ -15,7 +15,9 @@
     "setupFilesAfterEnv": [
       "./src/test/setup.ts"
     ],
-    "testTimeout": 30000
+    "testTimeout": 30000,
+    "forceExit": true,
+    "detectOpenHandles": true
   },
   "keywords": [],
   "author": "",

@@ -19,7 +19,10 @@ beforeAll(async () => {
   mongo = await MongoMemoryServer.create();
   const mongoUri = mongo.getUri();
 
-  await mongoose.connect(mongoUri);
+  await mongoose.connect(mongoUri, {
+    autoIndex: true,
+    serverSelectionTimeoutMS: 5000,
+  });
 });
 
 beforeEach(async () => {
@@ -51,7 +54,7 @@ global.signin = async () => {
   const deviceType = "web";
   const deviceName = "jest test";
 
-  // Register user
+  // Register user with error handling
   const signupResponse = await request(app)
     .post(`${global.apiPrefix}/signup`)
     .send({
@@ -59,13 +62,23 @@ global.signin = async () => {
       password,
     });
 
-  // Confirm user
-  await request(app).post(`${global.apiPrefix}/confirm-user`).send({
-    email,
-    confirmationCode: signupResponse.body.confirmationCode,
-  });
+  if (!signupResponse.body.confirmationCode) {
+    throw new Error("No confirmation code received from signup");
+  }
 
-  // Sign in user
+  // Confirm user with error handling
+  const confirmResponse = await request(app)
+    .post(`${global.apiPrefix}/confirm-user`)
+    .send({
+      email,
+      confirmationCode: signupResponse.body.confirmationCode,
+    });
+
+  if (confirmResponse.status !== 200) {
+    throw new Error(`User confirmation failed: ${confirmResponse.status}`);
+  }
+
+  // Sign in user with error handling
   const signInResponse = await request(app)
     .post(`${global.apiPrefix}/signin`)
     .send({
@@ -75,8 +88,13 @@ global.signin = async () => {
       deviceName,
     });
 
+  if (signInResponse.status !== 200) {
+    throw new Error(`Sign in failed: ${signInResponse.status}`);
+  }
+
   const cookie = signInResponse.get("Set-Cookie");
   if (!cookie) {
+    console.error("Sign in response:", signInResponse.body);
     throw new Error("Failed to get authentication cookie");
   }
 
