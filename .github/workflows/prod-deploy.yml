@@ -165,13 +165,20 @@ jobs:
           script: |
             try {
               const service = '${{ matrix.service }}';
-              console.log('Checking deployment for service:', service);
-              console.log('Repository:', context.repo.owner + '/' + context.repo.name);
+              // Get repository name from environment variable
+              const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
+              
+              console.log('Checking deployment for:', {
+                owner: owner,
+                repo: repo,
+                service: service,
+                sha: '${{ inputs.version }}'
+              });
               
               // First get all workflows
               const { data: workflows } = await github.rest.actions.listRepoWorkflows({
-                owner: context.repo.owner,
-                repo: context.repo.name
+                owner: owner,
+                repo: repo
               });
               
               console.log('Available workflows:', workflows.workflows.map(w => w.path));
@@ -184,8 +191,8 @@ jobs:
               
               // Get workflow runs for this specific workflow
               const { data: runs } = await github.rest.actions.listWorkflowRuns({
-                owner: context.repo.owner,
-                repo: context.repo.name,
+                owner: owner,
+                repo: repo,
                 workflow_id: devWorkflow.id,
                 status: 'completed',
                 conclusion: 'success'
@@ -207,8 +214,8 @@ jobs:
               
               // Get the jobs for this run to verify the service was deployed
               const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
-                owner: context.repo.owner,
-                repo: context.repo.name,
+                owner: owner,
+                repo: repo,
                 run_id: devDeployment.id
               });
               
