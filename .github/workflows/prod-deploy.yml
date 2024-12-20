@@ -23,20 +23,29 @@ jobs:
         with:
           script: |
             try {
-              // First check if the commit exists
-              const { data: commit } = await github.rest.repos.getCommit({
+              // Debug repository information
+              console.log('Repository context:', {
                 owner: context.repo.owner,
                 repo: context.repo.name,
-                ref: '${{ inputs.version }}'
+                sha: '${{ inputs.version }}'
+              });
+
+              // First check if the commit exists
+              const { data: commit } = await github.rest.repos.getCommit({
+                owner: context.repo.owner.trim(),  // Ensure no whitespace
+                repo: context.repo.name.trim(),    // Ensure no whitespace
+                ref: '${{ inputs.version }}'.trim()
               });
               
               console.log('Checking commit:', commit.sha);
               
               // Then get workflow runs
               const { data: workflows } = await github.rest.actions.listRepoWorkflows({
-                owner: context.repo.owner,
-                repo: context.repo.name
+                owner: context.repo.owner.trim(),
+                repo: context.repo.name.trim()
               });
+              
+              console.log('Available workflows:', workflows.workflows.map(w => w.path));
               
               const devWorkflow = workflows.workflows.find(w => w.path === '.github/workflows/dev-deploy.yml');
               if (!devWorkflow) {
