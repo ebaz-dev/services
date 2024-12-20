@@ -49,6 +49,8 @@ it("responds with a cookie when given valid credentials and user confirmed", asy
     })
     .expect(200);
 
+  console.log("BODY-----", registeredUser.body);
+
   const response = await request(app)
     .post(`${global.apiPrefix}/signin`)
     .send({
