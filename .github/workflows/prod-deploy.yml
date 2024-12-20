@@ -13,36 +13,40 @@ jobs:
     permissions:
       contents: read
       actions: read
-      deployments: write
-      issues: write
-    outputs:
-      services: ${{ steps.get-services.outputs.services }}
     steps:
+      - name: Debug Context
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Owner: ${{ github.repository_owner }}"
+          echo "SHA: ${{ inputs.version }}"
+
       - id: get-services
         uses: actions/github-script@v6
         with:
           script: |
             try {
-              // Debug repository information
+              // Get repository name from full repository path
+              const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
+              
               console.log('Repository context:', {
-                owner: context.repo.owner,
-                repo: context.repo.name,
+                owner: owner,
+                repo: repo,
                 sha: '${{ inputs.version }}'
               });
 
               // First check if the commit exists
               const { data: commit } = await github.rest.repos.getCommit({
-                owner: context.repo.owner.trim(),  // Ensure no whitespace
-                repo: context.repo.name.trim(),    // Ensure no whitespace
-                ref: '${{ inputs.version }}'.trim()
+                owner: owner,
+                repo: repo,
+                ref: '${{ inputs.version }}'
               });
               
               console.log('Checking commit:', commit.sha);
               
               // Then get workflow runs
               const { data: workflows } = await github.rest.actions.listRepoWorkflows({
-                owner: context.repo.owner.trim(),
-                repo: context.repo.name.trim()
+                owner: owner,
+                repo: repo
               });
               
               console.log('Available workflows:', workflows.workflows.map(w => w.path));
@@ -54,8 +58,8 @@ jobs:
               }
               
               const workflow_runs = await github.rest.actions.listWorkflowRuns({
-                owner: context.repo.owner,
-                repo: context.repo.name,
+                owner: owner,
+                repo: repo,
                 workflow_id: devWorkflow.id,
                 sha: '${{ inputs.version }}'
               });
@@ -71,8 +75,8 @@ jobs:
               console.log('Using workflow run:', run.id);
               
               const jobs = await github.rest.actions.listJobsForWorkflowRun({
-                owner: context.repo.owner,
-                repo: context.repo.name,
+                owner: owner,
+                repo: repo,
                 run_id: run.id
               });
               
