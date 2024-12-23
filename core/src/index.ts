@@ -31,3 +31,22 @@ export * from "./models/access-log";
 
 export * from "./utils/integration-uri";
 export * from "./utils/integrated-customers";
+
+// *Order service
+// **Events
+export * from "./events/order/cart-event-subjects";
+export * from "./events/order/cart-confirm-event";
+export * from "./events/order/cart-product-add-event";
+export * from "./events/order/cart-product-remove-event";
+export * from "./events/order/order-event-subjects";
+export * from "./events/order/order-create-event";
+export * from "./events/order/order-confirm-event";
+export * from "./events/order/order-deliver-event";
+export * from "./events/order/order-cancel-event";
+export * from "./events/order/order-payment-method-update-event";
+
+// **Models
+export * from "./models/order/cart";
+export * from "./models/order/order";
+export * from "./models/order/order-template";
+export * from "./models/order/order-log";
