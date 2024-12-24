@@ -26,16 +26,17 @@ jobs:
             grep -v "^core/" | \
             grep -v "^.github/" | \
             cut -d/ -f1 | \
-            sort -u | \
-            xargs)
-          echo "services=$(echo "$SERVICES" | jq -R -s -c 'split(" ")')" >> $GITHUB_OUTPUT
+            sort -u || true)
+          if [ -z "$SERVICES" ]; then
+            echo "services=[]" >> $GITHUB_OUTPUT
+          else
+            echo "services=$(echo "$SERVICES" | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+          fi
 
       - id: check-services
         run: |
-          SERVICES="${{ steps.changes.outputs.services }}"
-          # Remove any whitespace and newlines
-          SERVICES=$(echo "$SERVICES" | tr -d '[:space:]')
-          if [ "$SERVICES" = "[]" ]; then
+          SERVICES='${{ steps.changes.outputs.services }}'
+          if [ "$SERVICES" = "[]" ] || [ -z "$(echo $SERVICES | jq '. | length')" ]; then
             echo "has_changes=false" >> $GITHUB_OUTPUT
           else
             echo "has_changes=true" >> $GITHUB_OUTPUT
