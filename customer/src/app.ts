@@ -66,7 +66,7 @@ app.use(
 );
 
 app.use(currentUser);
-app.use(accessLogger("customer"));
+process.env.NODE_ENV !== "test" && app.use(accessLogger("customer"));
 
 app.use(apiPrefix, createRouter);
 app.use(apiPrefix, updateRouter);
