@@ -1,6 +1,6 @@
 import { Message } from "node-nats-streaming";
-import { Listener } from "@ezdev/core";
 import {
+  Listener,
   Order,
   OrderCreatedEvent,
   OrderEventSubjects,
@@ -23,7 +23,7 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
     }
 
     const employees = await Employee.find({ customerId: order.merchantId });
-    const userIds = employees.map((employee) => employee.id);
+    const userIds = employees.map((employee) => employee.userId);
 
     await sendMassNotifcation({
       userIds,
