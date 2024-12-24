@@ -87,6 +87,6 @@ jobs:
           kubectl config set-context kubernetes-admin@kubernetes --cluster=kubernetes --user=kubernetes-admin
           kubectl config use-context kubernetes-admin@kubernetes
 
-          kubectl apply -f ./${SERVICE}/k8s/dev/auth-depl.yaml
+          kubectl apply -f ./${SERVICE}/k8s/dev/${SERVICE}-depl.yaml
           kubectl set image deployment/${SERVICE}-depl ${SERVICE}=${{ secrets.DOCKER_USERNAME }}/${SERVICE}:${{ github.sha }}
           kubectl rollout status deployment/${SERVICE}-depl
