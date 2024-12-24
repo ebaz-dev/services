@@ -7,9 +7,11 @@ import {
   Customer,
   Merchant,
   EmployeeRoles,
+  Cart,
+  Order,
+  OrderTemplate,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import { Cart, Order, OrderTemplate } from "@ebazdev/order";
 import { Types } from "mongoose";
 
 const router = express.Router();

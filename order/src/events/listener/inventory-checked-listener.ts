@@ -14,12 +14,12 @@ import {
   OrderActions,
   OrderLog,
   OrderLogType,
+  Merchant,
 } from "@ezdev/core";
 import { natsWrapper } from "../../nats-wrapper";
 import { OrderCreatedPublisher } from "../publisher/order-created-publisher";
 import { migrateProducts } from "../../utils/migrateProducts";
 import { getOrderNumber } from "../../utils/order-number";
-import { Merchant } from "@ebazdev/customer";
 
 export class CartInventoryCheckedListener extends Listener<CartInventoryCheckedEvent> {
   readonly subject = OrderInventoryEventSubjects.CartInventoryChecked;

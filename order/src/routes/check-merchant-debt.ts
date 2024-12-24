@@ -1,5 +1,5 @@
 import { colaMerchantPayments } from "@ebazdev/cola-integration";
-import { HoldingSupplierCodes, Merchant } from "@ebazdev/customer";
+import { HoldingSupplierCodes, Merchant } from "@ezdev/core";
 import express, { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { Types } from "mongoose";

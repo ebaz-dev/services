@@ -12,7 +12,7 @@
     "windows:clean": "if exist build rmdir /s /q build",
     "windows:build": "npm run windows:clean && tsc",
     "watch": "tsc -w",
-    "link-all": "npm link && cd ../auth && npm link @ezdev/core && cd ../customer && npm link @ezdev/core"
+    "link-all": "npm link && cd ../auth && npm link @ezdev/core && cd ../customer && npm link @ezdev/core ../notification && npm link @ezdev/core ../order && npm link @ezdev/core ../report && npm link @ezdev/core"
   },
   "keywords": [
     "node",

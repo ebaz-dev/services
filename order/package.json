@@ -26,7 +26,6 @@
     "@ebazdev/auth": "^1.0.20",
     "@ebazdev/cola-integration": "^1.0.36",
     "@ezdev/core": "^1.0.0",
-    "@ebazdev/customer": "^1.0.43",
     "@ebazdev/inventory": "^1.0.23",
     "@ebazdev/payment": "^1.0.14",
     "@ebazdev/product": "^1.0.83",

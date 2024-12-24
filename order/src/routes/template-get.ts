@@ -8,9 +8,9 @@ import {
   validateRequest,
   OrderTemplate,
   OrderTemplateDoc,
+  Customer,
 } from "@ezdev/core";
 import { Product } from "@ebazdev/product";
-import { Customer } from "@ebazdev/customer";
 import { Inventory } from "@ebazdev/inventory";
 import { Promo } from "@ebazdev/product/build/models/promo";
 import { Types } from "mongoose";

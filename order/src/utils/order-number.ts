@@ -1,5 +1,4 @@
-import { Sequence } from "@ezdev/core";
-import { Supplier } from "@ebazdev/customer";
+import { Sequence, Supplier } from "@ezdev/core";
 import moment from "moment";
 
 export const getOrderNumber = async (

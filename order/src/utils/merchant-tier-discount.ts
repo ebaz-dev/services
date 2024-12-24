@@ -1,8 +1,5 @@
 import { AnungooAPIClient } from "@ebazdev/cola-integration";
-import {
-  HoldingBusinessCodes,
-  HoldingBusinessTypeCodes,
-} from "@ebazdev/customer";
+import { HoldingBusinessTypeCodes } from "@ezdev/core";
 import axios from "axios";
 
 export const getMerchantTierDiscount = async (

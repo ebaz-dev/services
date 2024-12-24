@@ -3,9 +3,14 @@ import {
   Product,
   ProductDoc,
 } from "@ebazdev/product";
-import { Cart, CartDoc } from "@ezdev/core";
+import {
+  Cart,
+  CartDoc,
+  HoldingSupplierCodes,
+  Merchant,
+  Supplier,
+} from "@ezdev/core";
 import { Types } from "mongoose";
-import { HoldingSupplierCodes, Merchant, Supplier } from "@ebazdev/customer";
 import { getMerchantTierDiscount } from "./merchant-tier-discount";
 
 export const migrateProducts = async (cart: CartDoc): Promise<any> => {

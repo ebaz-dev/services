@@ -1,9 +1,13 @@
 import { Message } from "node-nats-streaming";
 import { Listener } from "@ezdev/core";
-import { Order, OrderCreatedEvent, OrderEventSubjects } from "@ebazdev/order";
+import {
+  Order,
+  OrderCreatedEvent,
+  OrderEventSubjects,
+  Employee,
+} from "@ezdev/core";
 import { queueGroupName } from "./queue-group-name";
 import { sendMassNotifcation } from "../../utils/send-mass-notificaion";
-import { Employee } from "@ebazdev/customer";
 
 export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
   readonly subject = OrderEventSubjects.OrderCreated;

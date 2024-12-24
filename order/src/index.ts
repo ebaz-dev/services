@@ -5,7 +5,7 @@ import { CartInventoryCheckedListener } from "./events/listener/inventory-checke
 import { InvoicePaidListener } from "./events/listener/invoice-paid-listener";
 import { ColaOrderStatusReceivedListener } from "./events/listener/cola-order-status";
 import { User } from "@ebazdev/auth";
-import { Customer, CustomerCategory, Location } from "@ebazdev/customer";
+import { Customer, CustomerCategory, Location } from "@ezdev/core";
 
 const start = async () => {
   if (!process.env.PORT) {
