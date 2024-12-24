@@ -4,8 +4,13 @@
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "files": [
-    "build/**/*"
+    "build/**/*",
+    "lib/**/*"
   ],
+  "exports": {
+    ".": "./build/index.js",
+    "./lib/mongoose": "./build/lib/mongoose/index.js"
+  },
   "scripts": {
     "clean": "del ./build/*",
     "build": "npm run clean && tsc",
