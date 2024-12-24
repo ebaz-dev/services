@@ -10,7 +10,7 @@ import {
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 import { query } from "express-validator";
-import mongoose, { Types } from "mongoose";
+import mongoose, { Types } from "@ezdev/core/lib/mongoose";
 const router = express.Router();
 
 router.get(

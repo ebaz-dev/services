@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { Order, QueryOptions, validateRequest } from "@ezdev/core";
-import { Types } from "mongoose";
+import { Types } from "@ezdev/core/lib/mongoose";
 import * as xl from "excel4node";
 import { convertToUserTimezone } from "../../utils/date-time-format";
 

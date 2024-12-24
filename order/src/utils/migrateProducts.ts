@@ -10,7 +10,7 @@ import {
   Merchant,
   Supplier,
 } from "@ezdev/core";
-import { Types } from "mongoose";
+import { Types } from "@ezdev/core/lib/mongoose";
 import { getMerchantTierDiscount } from "./merchant-tier-discount";
 
 export const migrateProducts = async (cart: CartDoc): Promise<any> => {

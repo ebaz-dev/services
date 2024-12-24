@@ -11,7 +11,7 @@ import {
   EmployeeRoles,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 import { getCustomerNumber } from "../utils/customer-number-generate";
 
 const router = express.Router();

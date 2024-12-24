@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import { StatusCodes } from "http-status-codes";
-import mongoose, { Types } from "mongoose";
+import mongoose, { Types } from "@ezdev/core/lib/mongoose";
 import { natsWrapper } from "../nats-wrapper";
 import {
   BadRequestError,

@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { BadRequestError, validateRequest, Location } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 
 const router = express.Router();
 

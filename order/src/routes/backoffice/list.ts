@@ -6,7 +6,7 @@ import {
   listAndCount,
   validateRequest,
 } from "@ezdev/core";
-import { Types } from "mongoose";
+import { Types } from "@ezdev/core/lib/mongoose";
 import { mergeProducts } from "../../utils/merge-products";
 
 const router = express.Router();

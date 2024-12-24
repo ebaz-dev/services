@@ -2,7 +2,7 @@ import * as _ from "lodash";
 import express, { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { prepareTemplate } from "./template-get";
-import { Types } from "mongoose";
+import { Types } from "@ezdev/core/lib/mongoose";
 import { query } from "express-validator";
 import {
   currentUser,

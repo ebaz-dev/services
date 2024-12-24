@@ -9,7 +9,7 @@ import {
 } from "@ezdev/core";
 import { body } from "express-validator";
 import { StatusCodes } from "http-status-codes";
-import mongoose, { Types } from "mongoose";
+import mongoose, { Types } from "@ezdev/core/lib/mongoose";
 import { User } from "@ebazdev/auth";
 
 const router = express.Router();
