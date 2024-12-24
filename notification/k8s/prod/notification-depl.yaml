@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-depl
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: notification
+  template:
+    metadata:
+      labels:
+        app: notification
+    spec: 
+      containers:
+        - name: notification
+          image: ebazdev/notification:latest
+          imagePullPolicy: Always
+          env:
+            - name: MONGO_URI
+              value: 'mongodb://ebaz-prod:774CPXo65J8i@103.229.178.56:27017/ebaz-prod?directConnection=true'
+            - name: JWT_KEY
+              value: '279112db517a6fadbfbb53500ee5e142a9036f1c972739e895c0d3ff7aa84af3'
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID
+              value: 'ebazaar_prod'
+            - name: NATS_USER
+              value: 'nats_prod'
+            - name: NATS_PASS
+              value: 'NaTs@Prod$EBaz'
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name 
+            - name: PORT
+              value: '3000'
+            - name: NODE_ENV
+              value: 'production'
+            - name: FB_TYPE
+              value: "service_account"
+            - name: FB_PROJECT_ID
+              value: "ebazaar-pro"
+            - name: FB_PRIVATE_KEY_ID
+              value: "dc1e9c45534c08b5b58758baa8efcf5ec09b3383"
+            - name: FB_PRIVATE_KEY
+              value: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCVesXHxYQ1/LtF\nHyQNj/EUltrFWW3t1ds5rfyfyrPI6S8489I9KB+Jzo5tHoVB4FkEAXovNlCnEkAj\nssHTaeikh5wHwijybMyQ0CZ+5B/M5V7L2qVDhoQt+VngmiIhaNcx9UJKd+DWHjDm\nEc2ITCNrRH6/mJL641u1hHSmQoIog9VqHuvjOsnS8eqAmxlZpogQUOXlwO/FY2eo\nQGFk3jnXVpC+Ew3qsXxMLp/aNqJf+AjOqdo7hlofxw1aE+iDFwyf+SGjT9kCu4Cl\nTlJnE2XaGqEFkDhssFpvhvbz6qfawGt+tG72QL7eM07TIH+OfdHYa7jFifF1MAlw\nqehrXUh5AgMBAAECggEABsE1BcmBp3Tju4RkOy6pfL4yZZ+cbZZv4SPhGhFtXWNY\nLHEsK3JQNoh8fCbYa7kpHJq6fD6ul1YmStatlpGfHyw3m0wlUIslFVgqnSpO25Hz\n3i9jr3D5MSCm9JTSfQMBUnMcS0Quh0529DaSvJmAMj02ow7QeYDjqIizQr4Xpp/4\nxHkD59hqF4wRgZbCpqP74ds6/uWd8p8+epMiQkSe0VAuGSHY0yl+2zfcyl7BvxsB\nveZs1TwFU/kgAOJ5Xwwq5+KqmvwnFOGbAG6eXWY+/cW5887Gx1p3hPzub0zqY9Wp\nDd4GMo2YeFg6wHgZ9eOwsYbf9w8Br9Fq510RMyAwwQKBgQDOv6caGV6pmeMRRbXB\nA/Nc4737uy7Vcq2DmLg5oY8v/6XCBeM46ZiR8RJvtkFkCl1JTR8DDzU9bVaBerKz\n37xv4JZs6Bna30l3G0QE4YBwwbVZFTt/R2KrKPNDsL3ykhzEYmyCR2pq+xeJKX81\nEa4HbHESgzzHYCBwRWHsn6QM0QKBgQC5FqBqMvJNyBBFLvGZZDXpRn839CUyzxW/\nQHLckPdgz0M/wm9fAl3D9PWMI3p8HA4TaB0f5p0L7XvqZZV7N3haRMKofI+Vtnfh\n29kMTJlG9HW6miC4cWUfIuxwuYcRR8U+0KMHj1jEhvF+SXmpv4hLooS+CVaQv4RR\n6n6yQnZLKQKBgAVafxg06feYTYHn/THXSVjxaLz49th+FLIgpTyQy2VhyEgC4QRb\nQCEfTevomz7c6dd5EMGChk1l5GSL6c6wj2+SMDL3u5uoRn24DgXWVP4WdfytiRHd\npldqQwpQrEp4sBgBuG+TK9VDVTOvCGU2ZPw6OZ9SGKPNAGoH0eZPp+7RAoGAJ8AX\nRZeZeGD+NY2Gb7YY6fes/NxfXNEiz4dM49fyeQUqYTgl6Ra+AobKcYVxGdSApWRX\n1PEXS2d+lHGqr+LS4zgfQkY2JCYjCwvHSp/sz1NTMXdGjbY0zIIYm4EM5AYw83Ol\nf8smelas6L1o9q7e27eUoKeqwr2O8nTVLv2dIDkCgYEAtWVRmSv6W9h+CevLVqZ2\n2lvhLk8Ttle5bIdaYGGv/4IKP9b+A9sNjKWwyEd0558ZWr42RMnOqhrqobsOCfKE\nFT1HW9F8er/x7DO6HVt6qBNlOfEAsDkfnGcoaauisPEJMToxQBa8m02CbABW7MLZ\nXe6Y/+Hge/kV7xHT0yaTjIw=\n-----END PRIVATE KEY-----\n"
+            - name: FB_CLIENT_EMAIL
+              value: "firebase-adminsdk-ra3tw@ebazaar-pro.iam.gserviceaccount.com"
+            - name: FB_CLIENT_ID
+              value: "110995286922743778679"
+            - name: FB_AUTH_URI
+              value: "https://accounts.google.com/o/oauth2/auth"
+            - name: FB_TOKEN_URI
+              value: "https://oauth2.googleapis.com/token"
+            - name: FB_AUTH_PROVIDER_X509_CERT_URL
+              value: "https://www.googleapis.com/oauth2/v1/certs"
+            - name: FB_CLIENT_X509_CERT_URL
+              value: "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-ra3tw%40ebazaar-pro.iam.gserviceaccount.com"
+            - name: FB_UNIVERSAL_DOMAIN
+              value: "googleapis.com"
+          readinessProbe:
+            httpGet:
+              path: /api/v1/notification/health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /api/v1/notification/health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-srv
+spec:
+  selector:
+    app: notification
+  ports:
+    - name: notification
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
