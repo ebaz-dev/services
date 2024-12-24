@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import { StatusCodes } from "http-status-codes";
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 import {
   BadRequestError,
   currentUser,

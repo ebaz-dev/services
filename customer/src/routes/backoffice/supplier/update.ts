@@ -7,7 +7,7 @@ import {
   SupplierDoc,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 import { CustomerUpdatedPublisher } from "../../../events/publisher/customer-updated-publisher";
 import { natsWrapper } from "../../../nats-wrapper";
 const router = express.Router();

@@ -8,7 +8,7 @@ import {
   Employee,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import { Types } from "mongoose";
+import { Types } from "@ezdev/core/lib/mongoose";
 import { User } from "@ebazdev/auth";
 
 const router = express.Router();

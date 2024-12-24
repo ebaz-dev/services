@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { BadRequestError, validateRequest } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 import { sendMassNotifcation } from "../utils/send-mass-notificaion";
 
 const router = express.Router();

@@ -2,7 +2,7 @@ import { colaMerchantPayments } from "@ebazdev/cola-integration";
 import { HoldingSupplierCodes, Merchant } from "@ezdev/core";
 import express, { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { Types } from "mongoose";
+import { Types } from "@ezdev/core/lib/mongoose";
 
 const router = express.Router();
 

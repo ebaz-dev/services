@@ -13,7 +13,7 @@ import {
 } from "@ezdev/core";
 import { body } from "express-validator";
 import { StatusCodes } from "http-status-codes";
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 import { natsWrapper } from "../nats-wrapper";
 import { CustomerUpdatedPublisher } from "../events/publisher/customer-updated-publisher";
 

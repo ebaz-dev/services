@@ -13,7 +13,7 @@ import {
 import { Product } from "@ebazdev/product";
 import { Inventory } from "@ebazdev/inventory";
 import { Promo } from "@ebazdev/product/build/models/promo";
-import { Types } from "mongoose";
+import { Types } from "@ezdev/core/lib/mongoose";
 
 const router = express.Router();
 

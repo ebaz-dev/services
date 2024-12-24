@@ -7,7 +7,7 @@ import {
   Employee,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import { Types } from "mongoose";
+import { Types } from "@ezdev/core/lib/mongoose";
 import _ from "lodash";
 
 const router = express.Router();
