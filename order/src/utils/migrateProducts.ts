@@ -99,7 +99,6 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
   ) {
     tierDiscount = await getMerchantTierDiscount(
       tradeshop?.tsId,
-      supplier.business,
       supplier.businessType
     );
   }
