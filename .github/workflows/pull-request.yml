@@ -32,7 +32,10 @@ jobs:
 
       - id: check-services
         run: |
-          if [ "${{ steps.changes.outputs.services }}" = "[]" ]; then
+          SERVICES="${{ steps.changes.outputs.services }}"
+          # Remove any whitespace and newlines
+          SERVICES=$(echo "$SERVICES" | tr -d '[:space:]')
+          if [ "$SERVICES" = "[]" ]; then
             echo "has_changes=false" >> $GITHUB_OUTPUT
           else
             echo "has_changes=true" >> $GITHUB_OUTPUT
