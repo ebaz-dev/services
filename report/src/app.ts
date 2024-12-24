@@ -28,7 +28,7 @@ app.use(
 );
 
 app.use(currentUser);
-app.use(accessLogger("report"));
+process.env.NODE_ENV !== "test" && app.use(accessLogger("report"));
 
 app.use(apiPrefix, healthRouter);
 // backoffice

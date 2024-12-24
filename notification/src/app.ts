@@ -31,7 +31,7 @@ app.use(
 );
 
 app.use(currentUser);
-app.use(accessLogger("notification"));
+process.env.NODE_ENV !== "test" && app.use(accessLogger("notification"));
 app.use(apiPrefix, healthRouter);
 app.use(apiPrefix, sendRouter);
 app.use(apiPrefix, listRouter);
