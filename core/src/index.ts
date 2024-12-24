@@ -72,3 +72,11 @@ export * from "./types/employee-roles";
 export * from "./types/holding-supplier-codes";
 export * from "./types/integration-keys";
 export * from "./types/vendor-codes";
+
+// *Notification service
+// **Events
+export * from "./events/notification/notification-event-subjects";
+export * from "./events/notification/send-sms-event";
+
+// **Models
+export * from "./models/notification/notification";
