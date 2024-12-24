@@ -5,7 +5,6 @@ import mongoose from "mongoose";
 import { natsWrapper } from "../nats-wrapper";
 import {
   BadRequestError,
-  currentUser,
   NotFoundError,
   requireAuth,
   validateRequest,
@@ -37,7 +36,6 @@ router.post(
       .isString()
       .withMessage("Delivery date is required"),
   ],
-  currentUser,
   requireAuth,
   validateRequest,
   async (req: Request, res: Response) => {

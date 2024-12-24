@@ -1,8 +1,8 @@
 import { Message } from "node-nats-streaming";
-import { Listener } from "@ebazdev/core";
 import { InvoicePaidEvent, InvoiceEventSubjects } from "@ebazdev/payment";
 import { queueGroupName } from "./queue-group-name";
 import {
+  Listener,
   Order,
   OrderStatus,
   OrderActions,

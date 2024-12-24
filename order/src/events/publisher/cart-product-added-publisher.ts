@@ -1,5 +1,8 @@
-import { Publisher } from "@ebazdev/core";
-import { CartEventSubjects, CartProductAddedEvent } from "@ezdev/core";
+import {
+  Publisher,
+  CartEventSubjects,
+  CartProductAddedEvent,
+} from "@ezdev/core";
 
 export class CartProductAddedPublisher extends Publisher<CartProductAddedEvent> {
   subject: CartEventSubjects.CartProductAdded =

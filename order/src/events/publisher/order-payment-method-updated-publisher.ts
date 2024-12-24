@@ -1,5 +1,5 @@
-import { Publisher } from "@ebazdev/core";
 import {
+  Publisher,
   OrderEventSubjects,
   OrderPaymentMethodUpdatedEvent,
 } from "@ezdev/core";

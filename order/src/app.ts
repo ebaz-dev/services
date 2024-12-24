@@ -6,7 +6,7 @@ import {
   currentUser,
   errorHandler,
   NotFoundError,
-} from "@ebazdev/core";
+} from "@ezdev/core";
 import cookieSession from "cookie-session";
 import * as dotenv from "dotenv";
 import { cartGetRouter } from "./routes/cart-get";
@@ -49,7 +49,7 @@ app.use(
 );
 
 app.use(currentUser);
-app.use(accessLogger("order"));
+process.env.NODE_ENV !== "test" && app.use(accessLogger("order"));
 
 app.use(apiPrefix, healthRouter);
 app.use(apiPrefix, cartConfirmRouter);

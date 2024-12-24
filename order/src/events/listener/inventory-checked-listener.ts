@@ -1,11 +1,11 @@
 import { Message } from "node-nats-streaming";
-import { Listener } from "@ebazdev/core";
 import {
   OrderInventoryEventSubjects,
   CartInventoryCheckedEvent,
 } from "@ebazdev/inventory";
 import { queueGroupName } from "./queue-group-name";
 import {
+  Listener,
   Cart,
   CartStatus,
   Order,
