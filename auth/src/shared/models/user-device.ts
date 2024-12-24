@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema } from "@ezdev/core/lib/mongoose";
 import { DeviceTypes } from "../types/device-types";
 
 export interface UserDeviceDoc extends Document {

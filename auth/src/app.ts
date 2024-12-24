@@ -31,7 +31,6 @@ const cookieOptions = {
   secure: process.env.NODE_ENV !== "test",
   keys: [process.env.JWT_KEY!],
 };
-console.log("cookieOptions", cookieOptions);
 app.use(cookieSession(cookieOptions));
 
 app.use(currentUser);
