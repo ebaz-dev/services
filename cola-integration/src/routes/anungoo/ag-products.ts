@@ -1,0 +1,178 @@
+import express, { Request, Response } from "express";
+import {
+  Product,
+  Supplier,
+  BadRequestError,
+  AnungooAPIClient,
+  BasProductData,
+} from "@ezdev/core";
+import { StatusCodes } from "http-status-codes";
+import { natsWrapper } from "../../nats-wrapper";
+import { Types } from "mongoose";
+import { BasProductRecievedEventPublisher } from "../../events/publisher/bas-product-recieved-publisher";
+import { BasProductUpdatedEventPublisher } from "../../events/publisher/bas-product-updated-publisher";
+import {
+  convertCapacity,
+  barcodeSanitizer,
+  eventDelay,
+} from "../../utils/bas-product-functions";
+
+const router = express.Router();
+
+router.get("/anungoo/product-list", async (req: Request, res: Response) => {
+  try {
+    const anungoo = await Supplier.find({
+      type: "supplier",
+      holdingKey: "AG",
+    });
+
+    if (!anungoo) {
+      throw new BadRequestError("Anungoo supplier not found.");
+    }
+
+    const anungooPng = anungoo?.filter((item) => item?.vendorKey === "AGPNG");
+    const anungooIone = anungoo?.filter((item) => item?.vendorKey === "AGIONE");
+
+    const productsResponse = await AnungooAPIClient.getClient().post(
+      `/api/ebazaar/getdataproductinfo`,
+      {}
+    );
+
+    let basProducts: BasProductData[] = productsResponse?.data?.data || [];
+
+    basProducts = basProducts.filter(
+      (product) =>
+        product.business === "ag_nonfood" || product.business === "ag_food"
+    );
+
+    if (basProducts.length === 0) {
+      throw new BadRequestError("No products from bas API.");
+    }
+
+    const existingProducts = await Product.find({
+      customerId: { $in: [anungooPng[0]?._id, anungooIone[0]?._id] },
+    });
+
+    const existingEbProductsMap = existingProducts.reduce((map, item) => {
+      if (item.thirdPartyData && Array.isArray(item.thirdPartyData)) {
+        const basIntegrationData = item.thirdPartyData.find(
+          (data: any) =>
+            data?.customerId?.toString() ===
+              (anungooPng[0]?._id as Types.ObjectId).toString() ||
+            data?.customerId?.toString() ===
+              (anungooIone[0]?._id as Types.ObjectId).toString()
+        );
+
+        if (basIntegrationData) {
+          map[basIntegrationData.productId] = item;
+        }
+      }
+      return map;
+    }, {} as { [key: string]: any });
+
+    const basNewProducts: BasProductData[] = [];
+    const basExistingProducts: BasProductData[] = [];
+
+    basProducts.forEach((item: BasProductData) => {
+      if (!existingEbProductsMap[item.productid.toString()]) {
+        basNewProducts.push(item);
+      } else {
+        basExistingProducts.push(item);
+      }
+    });
+
+    if (basNewProducts.length > 0) {
+      for (const item of basNewProducts) {
+        const capacity = await convertCapacity(item.capacity);
+        const sanitizedBarcode = await barcodeSanitizer(item.barcode);
+
+        const supplierId =
+          item.business === "ag_nonfood"
+            ? anungooPng[0]?._id
+            : anungooIone[0]?._id;
+
+        const eventPayload: any = {
+          supplierId: supplierId as Types.ObjectId,
+          basId: item.productid,
+          productName: item.productname,
+          brandName: item.brandname,
+          incase: item.incase,
+          sectorName: item.sectorname,
+          barcode: sanitizedBarcode,
+          business: item.business,
+          splitSale: true,
+        };
+
+        if (capacity !== 0) {
+          eventPayload.capacity = capacity;
+        }
+
+        await eventDelay(500);
+
+        await new BasProductRecievedEventPublisher(natsWrapper.client).publish(
+          eventPayload
+        );
+      }
+    }
+
+    for (const product of basExistingProducts) {
+      const item = existingEbProductsMap[product.productid];
+
+      if (item) {
+        const updatedFields: any = {};
+
+        const capacity = await convertCapacity(product.capacity);
+
+        const existingCapacity = item.attributes?.find(
+          (attr: any) => attr.key === "size"
+        )?.value;
+
+        const sanitizedBarcode = await barcodeSanitizer(product.barcode);
+
+        if (item.name !== product.productname) {
+          updatedFields.productName = product.productname;
+        }
+
+        if (!item.brandId) {
+          updatedFields.brandName = product.brandname;
+        }
+
+        if (existingCapacity !== capacity && capacity !== 0) {
+          updatedFields.capacity = capacity;
+        }
+
+        if (item.inCase !== product.incase) {
+          updatedFields.incase = product.incase;
+        }
+
+        if (item.barCode !== sanitizedBarcode && sanitizedBarcode !== "") {
+          updatedFields.barcode = sanitizedBarcode;
+        }
+
+        if (Object.keys(updatedFields).length > 0) {
+          await eventDelay(500);
+
+          const supplierId =
+            item.business === "ag_nonfood"
+              ? anungooPng[0]?._id
+              : anungooIone[0]?._id;
+
+          await new BasProductUpdatedEventPublisher(natsWrapper.client).publish(
+            {
+              supplierId: supplierId as Types.ObjectId,
+              productId: item._id,
+              updatedFields,
+            }
+          );
+        }
+      }
+    }
+
+    res.status(StatusCodes.OK).send({ messge: "Product list fetched." });
+  } catch (error: any) {
+    console.error("Cola integration anungoo product list fetch error:", error);
+    throw new BadRequestError("Something went wrong.");
+  }
+});
+
+export { router as agProductsRouter };
