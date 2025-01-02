@@ -13,7 +13,7 @@ import { natsWrapper } from "../../../nats-wrapper";
 const router = express.Router();
 
 router.put(
-  "supplier/:id",
+  "/supplier/:id",
   validateRequest,
   async (req: Request, res: Response) => {
     const session = await mongoose.startSession();
