@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import { Schema, Types } from "../../lib/mongoose";
 import { Customer, CustomerDoc } from "./customer";
 import {
   HoldingBusinessCodes,
@@ -74,6 +74,29 @@ const productQuerySchema = new Schema<ProductQueryDoc>(
   },
   { _id: false }
 );
+interface PromoBannerDoc extends Document {
+  id: Types.ObjectId;
+  url: string;
+}
+const promoBannerSchema = new Schema<PromoBannerDoc>(
+  {
+    id: {
+      type: Schema.Types.ObjectId,
+      require: true,
+    },
+    url: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    toJSON: {
+      transform(doc, ret) {
+        delete ret._id;
+      },
+    },
+  }
+);
 
 interface SupplierDoc extends CustomerDoc {
   orderMin: number;
@@ -90,6 +113,11 @@ interface SupplierDoc extends CustomerDoc {
   integrationKey?: IntegrationKeys;
   business?: HoldingBusinessCodes;
   businessType?: HoldingBusinessTypeCodes;
+  appData?: any;
+  promoBanners?: PromoBannerDoc[];
+  orderScheduleTime?: string;
+  termOfService: string;
+  showOnHome: boolean;
 }
 
 const Supplier = Customer.discriminator<SupplierDoc>(
@@ -125,6 +153,14 @@ const Supplier = Customer.discriminator<SupplierDoc>(
       enum: Object.values(HoldingBusinessTypeCodes),
       require: false,
     },
+    appData: Object,
+    promoBanners: [promoBannerSchema],
+    orderScheduleTime: { type: String, require: false },
+    termOfService: {
+      type: String,
+      require: false,
+    },
+    showOnHome: { type: Boolean, require: false, default: false },
   })
 );
 

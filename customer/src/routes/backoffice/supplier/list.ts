@@ -15,7 +15,9 @@ router.get(
   validateRequest,
   async (req: Request, res: Response) => {
     const filter: any = req.query.filter || {};
-    const criteria: any = {};
+    const criteria: any = {
+      parentId: { $exists: false },
+    };
     if (filter.name) {
       criteria.name = {
         $regex: filter.name,
@@ -66,9 +68,19 @@ router.get(
       { path: "district" },
       { path: "subDistrict" },
     ];
-    const data = await listAndCount(criteria, Supplier, options);
+    const result = await listAndCount(criteria, Supplier, options);
+    const parentIds = result.data.map((supplier) => supplier.id);
+    const branches = await Supplier.find({ parentId: { $in: parentIds } });
+    result.data = result.data.map((item) => {
+      const supplier: any = item.toJSON();
+      const filteredBranches = branches.filter(
+        (branch) => branch.parentId?.toString() === supplier.id.toString()
+      );
+      supplier.branches = filteredBranches;
+      return supplier;
+    });
 
-    res.status(StatusCodes.OK).send(data);
+    res.status(StatusCodes.OK).send(result);
   }
 );
 
