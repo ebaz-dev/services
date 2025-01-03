@@ -7,12 +7,10 @@ import {
   OrderActions,
   OrderLog,
   OrderLogType,
-} from "@ezdev/core";
-import {
+  colaOrderStatuses,
   ColaOrderStatusRecievedEvent,
   ColaOrderStatusSubjects,
-} from "@ebazdev/cola-integration";
-import { colaOrderStatuses } from "@ebazdev/cola-integration/build/models/cola-order-statuses";
+} from "@ezdev/core";
 import { OrderConfirmedPublisher } from "../publisher/order-confirmed-publisher";
 import { natsWrapper } from "../../nats-wrapper";
 import { OrderCancelledPublisher } from "../publisher/order-cancelled-publisher";

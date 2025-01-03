@@ -9,10 +9,10 @@ import {
   OrderTemplate,
   OrderTemplateDoc,
   Customer,
+  Product,
+  Promo,
+  Inventory,
 } from "@ezdev/core";
-import { Product } from "@ebazdev/product";
-import { Inventory } from "@ebazdev/inventory";
-import { Promo } from "@ebazdev/product/build/models/promo";
 import { Types } from "@ezdev/core/lib/mongoose";
 
 const router = express.Router();

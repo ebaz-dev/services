@@ -1,4 +1,4 @@
-import { colaMerchantPayments } from "@ebazdev/cola-integration";
+import { colaMerchantPayments } from "@ezdev/core";
 import { HoldingSupplierCodes, Merchant } from "@ezdev/core";
 import express, { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";

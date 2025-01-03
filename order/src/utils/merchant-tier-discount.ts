@@ -1,4 +1,4 @@
-import { AnungooAPIClient } from "@ebazdev/cola-integration";
+import { AnungooAPIClient } from "@ezdev/core";
 import { HoldingBusinessTypeCodes } from "@ezdev/core";
 import axios from "axios";
 

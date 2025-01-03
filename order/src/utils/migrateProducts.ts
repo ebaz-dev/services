@@ -1,14 +1,12 @@
 import {
-  IReturnFindWithAdjustedPrice,
-  Product,
-  ProductDoc,
-} from "@ebazdev/product";
-import {
   Cart,
   CartDoc,
   HoldingSupplierCodes,
   Merchant,
   Supplier,
+  IReturnFindWithAdjustedPrice,
+  Product,
+  ProductDoc,
 } from "@ezdev/core";
 import { Types } from "@ezdev/core/lib/mongoose";
 import { getMerchantTierDiscount } from "./merchant-tier-discount";

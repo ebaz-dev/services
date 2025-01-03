@@ -9,10 +9,10 @@ import {
   Cart,
   CartDoc,
   Customer,
+  Product,
+  Inventory,
+  Promo,
 } from "@ezdev/core";
-import { Product } from "@ebazdev/product";
-import { Inventory } from "@ebazdev/inventory";
-import { Promo } from "@ebazdev/product/build/models/promo";
 import { migrateProducts } from "../utils/migrateProducts";
 
 const router = express.Router();
