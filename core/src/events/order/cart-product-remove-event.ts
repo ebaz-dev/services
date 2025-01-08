@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { Types } from "../../lib/mongoose";
 import { CartEventSubjects } from "./cart-event-subjects";
 
 export interface CartProductRemovedEvent {

@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import { Schema } from "../../lib/mongoose";
 import { Customer, CustomerDoc } from "./customer";
 import { HoldingSupplierCodes } from "../../types/holding-supplier-codes";
 

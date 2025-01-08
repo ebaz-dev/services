@@ -6,10 +6,10 @@ import {
   requireAuth,
   validateRequest,
   Employee,
+  User,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 import { Types } from "@ezdev/core/lib/mongoose";
-import { User } from "@ebazdev/auth";
 
 const router = express.Router();
 

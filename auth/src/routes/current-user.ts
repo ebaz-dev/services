@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
-import { requireAuth } from "@ezdev/core";
-import { User } from "../shared";
+import { requireAuth, User } from "@ezdev/core";
 
 const router = express.Router();
 

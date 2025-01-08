@@ -1,5 +1,5 @@
 import { BasProductSubjects } from "./bas-product-event-subjects";
-import { Types } from "mongoose";
+import { Types } from "../../lib/mongoose";
 
 export interface BasProductRecievedEvent {
   subject: BasProductSubjects.BasProductRecieved;

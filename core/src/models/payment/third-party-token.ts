@@ -1,12 +1,10 @@
-import { Document, Schema, model, Types } from "mongoose";
+import { Document, Schema, model, Types } from "../../lib/mongoose";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
-
 
 export enum PaymentThirdPartyOrigin {
   QPay = "qpay",
   MBank = "mbank",
 }
-
 
 interface ThirdPartyExternalDataDoc extends Document {
   id: Types.ObjectId;
@@ -41,6 +39,9 @@ const thirdPartyExternalDataSchema = new Schema<ThirdPartyExternalDataDoc>(
 thirdPartyExternalDataSchema.set("versionKey", "version");
 thirdPartyExternalDataSchema.plugin(updateIfCurrentPlugin);
 
-const ThirdPartyExternalData = model<ThirdPartyExternalDataDoc>("ThirdPartyExternalData", thirdPartyExternalDataSchema);
+const ThirdPartyExternalData = model<ThirdPartyExternalDataDoc>(
+  "ThirdPartyExternalData",
+  thirdPartyExternalDataSchema
+);
 
 export { ThirdPartyExternalData };

@@ -1,8 +1,11 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import { User } from "../shared/models/user";
-import { BadRequestError, recognizePhoneNumber } from "@ezdev/core";
-import { validateRequest } from "@ezdev/core";
+import {
+  BadRequestError,
+  User,
+  recognizePhoneNumber,
+  validateRequest,
+} from "@ezdev/core";
 
 const router = express.Router();
 

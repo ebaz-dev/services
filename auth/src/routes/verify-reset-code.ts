@@ -1,10 +1,10 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import { User } from "../shared/models/user";
 import {
   BadRequestError,
   recognizePhoneNumber,
   validateRequest,
+  User,
 } from "@ezdev/core";
 
 const router = express.Router();

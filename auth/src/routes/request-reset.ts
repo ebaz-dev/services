@@ -1,10 +1,12 @@
 import express, { Request, Response } from "express";
-import { User } from "../shared/models/user";
-import { BadRequestError } from "@ezdev/core";
+import {
+  BadRequestError,
+  User,
+  generateConfirmationCode,
+  EXPIRATION_CONFIRMATION_SECONDS,
+} from "@ezdev/core";
 import { SendSMSPublisher } from "../events/publisher/send-sms-publisher";
 import { natsWrapper } from "../nats-wrapper";
-import { generateConfirmationCode } from "../shared/utils/generate-confirmation-code";
-import { EXPIRATION_CONFIRMATION_SECONDS } from "../shared/utils/constants";
 
 const router = express.Router();
 
