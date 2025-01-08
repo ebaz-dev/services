@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import mongoose, { Types } from "mongoose";
+import mongoose, { Types }   from "@ezdev/core/lib/mongoose";
 import {
   Cart,
   CartEventSubjects,
