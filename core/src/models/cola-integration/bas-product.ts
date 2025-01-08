@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { ObjectId } from "../../lib/mongoose";
 
 interface BasProductData {
   productid: number;

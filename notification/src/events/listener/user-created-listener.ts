@@ -1,8 +1,7 @@
-import { Listener } from "@ezdev/core";
+import { Listener, AuthEventSubjects, UserCreatedEvent } from "@ezdev/core";
 import { Message } from "node-nats-streaming";
 import { queueGroupName } from "./queue-group-name";
 import axios from "axios";
-import { AuthEventSubjects, UserCreatedEvent } from "@ebazdev/auth";
 
 export class UserCreatedListener extends Listener<UserCreatedEvent> {
   subject: AuthEventSubjects.UserCreated = AuthEventSubjects.UserCreated;
