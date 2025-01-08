@@ -1,4 +1,4 @@
-import { Model } from "mongoose";
+import { Model } from "../lib/mongoose";
 import { QueryOptions } from "./query-options";
 
 const onlyCount = async (

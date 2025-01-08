@@ -1,5 +1,5 @@
-import mongoose, { Document, Schema } from "@ezdev/core/lib/mongoose";
-import { Password } from "../utils/password";
+import mongoose, { Document, Schema } from "../../lib/mongoose";
+import { Password } from "../../utils/password";
 
 export interface UserDoc extends Document {
   email?: string;

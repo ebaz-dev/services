@@ -1,4 +1,4 @@
-import { Document, Schema, Types, model } from "mongoose";
+import { Document, Schema, Types, model } from "../../lib/mongoose";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 export enum CartStatus {
   Created = "created",
@@ -63,7 +63,7 @@ const cartSchema = new Schema<CartDoc>(
     products: [cartProductSchema],
     orderedAt: Date,
     deliveryDate: Date,
-    returnedProducts: [String]
+    returnedProducts: [String],
   },
   {
     timestamps: true,

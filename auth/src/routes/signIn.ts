@@ -5,12 +5,13 @@ import {
   BadRequestError,
   recognizePhoneNumber,
   NotFoundError,
+  DeviceTypes,
+  User,
+  UserDevice,
+  Password,
 } from "@ezdev/core";
-import { UserDevice, DeviceTypes, User } from "../shared";
-import { Password } from "../shared/utils/password";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
-import { MobileDeviceTypes } from "../shared/types/device-types";
 import { v5 as uuidv5 } from "uuid";
 
 const router = express.Router();

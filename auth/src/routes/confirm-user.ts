@@ -1,15 +1,14 @@
 import express, { Request, Response } from "express";
-import { User } from "../shared";
 import {
   BadRequestError,
   IsExpired,
   NotFoundError,
   recognizePhoneNumber,
   validateRequest,
+  User,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 import { body } from "express-validator";
-import jwt from "jsonwebtoken";
 
 const router = express.Router();
 

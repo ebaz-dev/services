@@ -4,13 +4,13 @@ import {
   validateRequest,
   BadRequestError,
   recognizePhoneNumber,
+  User,
+  generateConfirmationCode,
+  EXPIRATION_CONFIRMATION_SECONDS,
 } from "@ezdev/core";
-import { User } from "../shared/models/user";
 import { StatusCodes } from "http-status-codes";
 import { UserCreatedCreatedPublisher } from "../events/publisher/user-created-publisher";
 import { natsWrapper } from "../nats-wrapper";
-import { generateConfirmationCode } from "../shared/utils/generate-confirmation-code";
-import { EXPIRATION_CONFIRMATION_SECONDS } from "../shared/utils/constants";
 
 const router = express.Router();
 

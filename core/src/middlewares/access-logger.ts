@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "../lib/mongoose";
 import { Request, Response, NextFunction } from "express";
 import { AccessLog } from "../models/access-log";
 

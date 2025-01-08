@@ -1,4 +1,4 @@
-import mongoose, { Model } from "mongoose";
+import mongoose, { Model } from "../lib/mongoose";
 import { QueryOptions } from "./query-options";
 
 const listAndCount = async (

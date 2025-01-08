@@ -5,7 +5,7 @@ import mongoose, {
   Types,
   Model,
   FilterQuery,
-} from "mongoose";
+} from "../../lib/mongoose";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 import { ProductPrice, Price } from "./price";
 import { Brand } from "./brand";

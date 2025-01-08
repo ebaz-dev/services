@@ -1,6 +1,5 @@
-import { currentUser } from "@ezdev/core";
+import { currentUser, UserDevice } from "@ezdev/core";
 import express, { Request, Response } from "express";
-import { UserDevice } from "../shared";
 
 const router = express.Router();
 

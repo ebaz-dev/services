@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "../../lib/mongoose";
 
 interface EventLogAttrs {
   cartId: mongoose.Types.ObjectId;
