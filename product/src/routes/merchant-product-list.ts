@@ -9,7 +9,7 @@ import {
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 
-import mongoose, { FilterQuery } from "mongoose";
+import mongoose, { FilterQuery }  from "@ezdev/core/lib/mongoose";
 
 const router = express.Router();
 

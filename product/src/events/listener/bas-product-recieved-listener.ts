@@ -9,7 +9,7 @@ import {
 } from "@ezdev/core";
 import { queueGroupName } from "./queu-group-name";
 import { ProductCreatedPublisher } from "../publisher/product-created-publisher";
-import mongoose from "mongoose";
+import mongoose  from "@ezdev/core/lib/mongoose";
 import slugify from "slugify";
 import { natsWrapper } from "../../nats-wrapper";
 import { DefaultImage } from "../../utils/default-image";

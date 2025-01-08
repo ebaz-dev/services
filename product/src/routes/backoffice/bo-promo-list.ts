@@ -7,7 +7,7 @@ import {
   requireAuth,
   Promo,
 } from "@ezdev/core";
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 
 const router = express.Router();
 

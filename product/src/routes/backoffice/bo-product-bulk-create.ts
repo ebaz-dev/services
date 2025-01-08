@@ -9,7 +9,7 @@ import {
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 import slugify from "slugify";
-import mongoose, { Types } from "mongoose";
+import mongoose, { Types } from "@ezdev/core/lib/mongoose";
 import { natsWrapper } from "../../nats-wrapper";
 
 const router = express.Router();
