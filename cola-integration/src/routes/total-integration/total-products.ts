@@ -72,10 +72,11 @@ router.get("/total/product-list", async (req: Request, res: Response) => {
 
     const existingEbProductsMap = existingEbProducts.reduce((map, item) => {
       if (item.thirdPartyData && Array.isArray(item.thirdPartyData)) {
-        const thirdPartyDataArray = item.thirdPartyData as ThirdPartyData[];
+        const thirdPartyDataArray = item.thirdPartyData as any[];
 
         const colaIntegrationData = thirdPartyDataArray.find(
-          (data: ThirdPartyData) => data?.customerId.equals(totalSupplierId)
+          (data: ThirdPartyData) =>
+            data?.customerId.toString() === totalSupplierId.toString()
         );
 
         if (colaIntegrationData) {
