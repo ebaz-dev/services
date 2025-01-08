@@ -7,7 +7,7 @@ export interface BasProductRecievedEvent {
     supplierId: Types.ObjectId;
     basId: string;
     productName: string;
-    brandName: string;
+    brandName?: string;
     incase?: number;
     capacity?: number;
     sectorName?: string;
