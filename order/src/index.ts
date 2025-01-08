@@ -4,8 +4,7 @@ import { natsWrapper } from "./nats-wrapper";
 import { CartInventoryCheckedListener } from "./events/listener/inventory-checked-listener";
 import { InvoicePaidListener } from "./events/listener/invoice-paid-listener";
 import { ColaOrderStatusReceivedListener } from "./events/listener/cola-order-status";
-import { User } from "@ebazdev/auth";
-import { Customer, CustomerCategory, Location } from "@ezdev/core";
+import { Customer, CustomerCategory, Location, User } from "@ezdev/core";
 
 const start = async () => {
   if (!process.env.PORT) {

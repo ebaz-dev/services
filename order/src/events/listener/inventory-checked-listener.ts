@@ -1,8 +1,4 @@
 import { Message } from "node-nats-streaming";
-import {
-  OrderInventoryEventSubjects,
-  CartInventoryCheckedEvent,
-} from "@ebazdev/inventory";
 import { queueGroupName } from "./queue-group-name";
 import {
   Listener,
@@ -15,6 +11,8 @@ import {
   OrderLog,
   OrderLogType,
   Merchant,
+  OrderInventoryEventSubjects,
+  CartInventoryCheckedEvent,
 } from "@ezdev/core";
 import { natsWrapper } from "../../nats-wrapper";
 import { OrderCreatedPublisher } from "../publisher/order-created-publisher";
