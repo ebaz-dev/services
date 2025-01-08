@@ -1,5 +1,4 @@
 import { Message } from "node-nats-streaming";
-import { InvoicePaidEvent, InvoiceEventSubjects } from "@ebazdev/payment";
 import { queueGroupName } from "./queue-group-name";
 import {
   Listener,
@@ -8,6 +7,8 @@ import {
   OrderActions,
   OrderLog,
   OrderLogType,
+  InvoicePaidEvent,
+  InvoiceEventSubjects,
 } from "@ezdev/core";
 import { natsWrapper } from "../../nats-wrapper";
 import _ from "lodash";
