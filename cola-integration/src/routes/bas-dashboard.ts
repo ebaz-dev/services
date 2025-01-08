@@ -18,7 +18,12 @@ export const fetchDataFromAPI = async (
 ) => {
   try {
     const response = await client.post(endpoint, body);
-    return response?.data?.data ?? [];
+
+    if (endpoint === "/api/ebazaar/getdataaudit") {
+      return response?.data;
+    } else {
+      return response?.data?.data ?? [];
+    }
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       return [];
