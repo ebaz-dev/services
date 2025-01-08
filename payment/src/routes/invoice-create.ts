@@ -13,7 +13,7 @@ import { StatusCodes } from "http-status-codes";
 import { InvoiceCreatedPublisher } from "../events/publisher/invoice-created-publisher";
 import { natsWrapper } from "../nats-wrapper";
 import axios from "axios";
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 // import { QpayClient } from "../shared/utils/qpay-api-client"
 import { qpayClient } from "../utils/qpay-client";
 

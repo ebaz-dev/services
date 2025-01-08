@@ -4,7 +4,7 @@ import { validateRequest, BadRequestError, Inventory } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 import { InventoryCreatedPublisher } from "../events/publisher/inventory-created-publisher";
 import { natsWrapper } from "../nats-wrapper";
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 
 const router = express.Router();
 
