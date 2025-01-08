@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose  from "@ezdev/core/lib/mongoose";
 import { app } from "./app";
 import { natsWrapper } from "./nats-wrapper";
 import { InventoryCreatedListener } from "./events/listener/inventory-created-listener";

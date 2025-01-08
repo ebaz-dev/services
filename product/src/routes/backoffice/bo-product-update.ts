@@ -8,7 +8,7 @@ import {
   Product,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 import slugify from "slugify";
 import { ProductUpdatedPublisher } from "../../events/publisher/product-updated-publisher";
 import { natsWrapper } from "../../nats-wrapper";

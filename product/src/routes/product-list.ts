@@ -9,7 +9,7 @@ import {
   Merchant,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import mongoose, { FilterQuery, Types } from "mongoose";
+import mongoose, { FilterQuery, Types }  from "@ezdev/core/lib/mongoose";
 
 const router = express.Router();
 const validOrderByFields = [

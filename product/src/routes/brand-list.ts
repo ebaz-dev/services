@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { query } from "express-validator";
 import { StatusCodes } from "http-status-codes";
 import { validateRequest, requireAuth, Brand } from "@ezdev/core";
-import mongoose from "mongoose";
+import mongoose  from "@ezdev/core/lib/mongoose";
 
 const router = express.Router();
 

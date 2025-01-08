@@ -7,7 +7,7 @@ import {
   Vendor,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 import slugify from "slugify";
 
 const router = express.Router();

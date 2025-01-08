@@ -8,7 +8,7 @@ import {
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 import slugify from "slugify";
-import mongoose from "mongoose";
+import mongoose  from "@ezdev/core/lib/mongoose";
 
 const router = express.Router();
 

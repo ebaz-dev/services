@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { body } from "express-validator";
-import mongoose from "mongoose";
+import mongoose  from "@ezdev/core/lib/mongoose";
 import slugify from "slugify";
 import {
   validateRequest,

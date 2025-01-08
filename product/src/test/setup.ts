@@ -1,5 +1,5 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
-import mongoose from "mongoose";
+import mongoose  from "@ezdev/core/lib/mongoose";
 import jwt from "jsonwebtoken";
 
 declare global {
