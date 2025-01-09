@@ -11,7 +11,7 @@ import {
   TotalAPIClient,
 } from "@ezdev/core";
 import moment from "moment";
-import { Types } from "mongoose";
+import { Types } from "@ezdev/core/lib/mongoose";
 
 const baseSendOrder = async (orderId: string) => {
   try {
