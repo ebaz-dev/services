@@ -3,7 +3,7 @@ import {
   Merchant,
   colaMerchantPayments,
 } from "@ezdev/core";
-import { Types } from "mongoose";
+import { Types } from "@ezdev/core/lib/mongoose";
 
 const checkMerchantDebt = async (merchantId: string) => {
   const merchant = await Merchant.findById(new Types.ObjectId(merchantId));

@@ -1,4 +1,4 @@
-import { ObjectId } from "mongoose";
+import { ObjectId } from "@ezdev/core/lib/mongoose";
 
 export const arraysEqual = (a: any[], b: any[]): boolean => {
   if (a === b) return true;

@@ -1,4 +1,4 @@
-import { Types, ObjectId } from "mongoose";
+import { Types, ObjectId } from "@ezdev/core/lib/mongoose";
 import { checkPromoFields } from "./check-updates";
 import { natsWrapper } from "../../nats-wrapper";
 import { BasPromoUpdatedEventPublisher } from "../../events/publisher/bas-promo-updated-event-publisher";

@@ -10,7 +10,7 @@ import {
 import axios from "axios";
 import { getColaToken } from "./get-token";
 import moment from "moment";
-import { Types } from "mongoose";
+import { Types } from "@ezdev/core/lib/mongoose";
 
 const sendOrder = async (orderId: string) => {
   try {

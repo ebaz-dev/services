@@ -8,7 +8,7 @@ import {
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 import { natsWrapper } from "../../nats-wrapper";
-import { Types } from "mongoose";
+import { Types } from "@ezdev/core/lib/mongoose";
 import { BasProductRecievedEventPublisher } from "../../events/publisher/bas-product-recieved-publisher";
 import { BasProductUpdatedEventPublisher } from "../../events/publisher/bas-product-updated-publisher";
 import {

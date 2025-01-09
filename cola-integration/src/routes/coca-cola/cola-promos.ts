@@ -7,7 +7,7 @@ import {
   ColaAPIClient,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import { ObjectId } from "mongoose";
+import { ObjectId } from "@ezdev/core/lib/mongoose";
 import { createPromoDataMaps } from "../../utils/promo-functions/generate-data-map";
 import { matchProducts } from "../../utils/promo-functions/match-products";
 import { checkAndUpdatePromo } from "../../utils/promo-functions/check-existing-promo";

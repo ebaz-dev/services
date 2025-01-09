@@ -1,4 +1,4 @@
-import { Types, ObjectId } from "mongoose";
+import { Types, ObjectId } from "@ezdev/core/lib/mongoose";
 import { natsWrapper } from "../../nats-wrapper";
 import { BasPromoRecievedEventPublisher } from "../../events/publisher/bas-promo-recieved-event-publisher";
 
