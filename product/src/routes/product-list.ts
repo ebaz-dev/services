@@ -250,9 +250,10 @@ router.get(
           promoQuery.customerId = new Types.ObjectId(query.customerId);
         const promoConditions: FilterQuery<any>[] = [];
 
-        if (promotion) promoConditions.push({ promoTypeId: { $in: [1, 2] } });
+        if (promotion)
+          promoConditions.push({ promoTypeId: { $in: [1, 2, 5, 6] } });
 
-        if (discount) promoConditions.push({ promoTypeId: { $in: [3] } });
+        if (discount) promoConditions.push({ promoTypeId: { $in: [3, 4] } });
 
         if (promoConditions.length > 0) {
           promoQuery.$or = promoConditions;
