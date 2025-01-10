@@ -66,7 +66,7 @@ router.get("/bas/dashboard-data", async (req: Request, res: Response) => {
     }
 
     const isTotalMerchant = merchant.tradeShops.some(
-      (item) => item.holdingKey === "TD"
+      (item: any) => item.holdingKey === "TD"
     );
 
     const holdingKey = supplier.holdingKey;
@@ -74,7 +74,7 @@ router.get("/bas/dashboard-data", async (req: Request, res: Response) => {
     const businessType = supplier.businessType;
 
     const merchantBasId = merchant.tradeShops.find(
-      (item) => item.holdingKey === holdingKey
+      (item: any) => item.holdingKey === holdingKey
     )?.tsId;
 
     if (!merchantBasId) {
@@ -83,15 +83,10 @@ router.get("/bas/dashboard-data", async (req: Request, res: Response) => {
         data: [],
       });
     }
-    console.log(holdingKey);
-    console.log(supplierTag);
-    console.log(businessType);
-    console.log(merchantBasId);
 
     const businessLocation = isTotalMerchant ? "Орон нутаг" : "Хот";
-    console.log(businessLocation);
 
-    let client;
+    let client: any;
     if (isTotalMerchant) {
       client = TotalAPIClient.getClient();
     } else {
@@ -112,7 +107,7 @@ router.get("/bas/dashboard-data", async (req: Request, res: Response) => {
 
     let orderList = [];
     let discountList = [];
-    let salesPerformance = [];
+    let salesPerformance: any[] = [];
     let coolerList = [];
     let rackList = [];
     let printingsList = [];
@@ -194,6 +189,33 @@ router.get("/bas/dashboard-data", async (req: Request, res: Response) => {
             tradeshopid: merchantBasId,
           }),
         ]);
+
+        orderList = orderList.filter(
+          (item: any) => item.businesstype === businessType
+        );
+
+        const businessTypeMapping: { [key: string]: string } = {
+          data_pg: "ag_nonfood",
+          data_ione: "ag_food",
+          data_ico: "mg_nonfood",
+          data_nestle: "mg_nonfood",
+        };
+
+        const filteredSalesPerformance: any = {};
+        for (const key in salesPerformance) {
+          if (salesPerformance.hasOwnProperty(key)) {
+            const origin = businessTypeMapping[key];
+            if (origin === businessType) {
+              filteredSalesPerformance[key] = salesPerformance[key];
+            }
+          }
+        }
+
+        const salesPerformanceArray: any[] = Object.values(
+          filteredSalesPerformance
+        ).flat();
+
+        salesPerformance = salesPerformanceArray;
       } else if (supplierTag === "Coca Cola") {
         const client = ColaAPIClient.getClient();
         [
