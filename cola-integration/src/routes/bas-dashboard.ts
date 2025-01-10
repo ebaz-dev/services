@@ -181,11 +181,14 @@ router.get("/bas/dashboard-data", async (req: Request, res: Response) => {
       if (supplierTag === "Anungoo" || supplierTag === "MarketGate") {
         const client = AnungooAPIClient.getClient();
 
-        [orderList, salesPerformance] = await Promise.all([
+        [orderList, salesPerformance, discountList] = await Promise.all([
           fetchDataFromAPI(client, "/api/ebazaar/getdatasales", {
             tradeshopid: merchantBasId,
           }),
           fetchDataFromAPI(client, "/api/ebazaar/getdataaudit", {
+            tradeshopid: merchantBasId,
+          }),
+          fetchDataFromAPI(client, "/api/ebazaar/getdatadiscount", {
             tradeshopid: merchantBasId,
           }),
         ]);
@@ -198,7 +201,7 @@ router.get("/bas/dashboard-data", async (req: Request, res: Response) => {
           data_pg: "ag_nonfood",
           data_ione: "ag_food",
           data_ico: "mg_nonfood",
-          data_nestle: "mg_nonfood",
+          data_nestle: "mg_food",
         };
 
         const filteredSalesPerformance: any = {};
@@ -216,6 +219,10 @@ router.get("/bas/dashboard-data", async (req: Request, res: Response) => {
         ).flat();
 
         salesPerformance = salesPerformanceArray;
+
+        discountList = discountList.filter(
+          (item: any) => item.businesstype === businessType
+        );
       } else if (supplierTag === "Coca Cola") {
         const client = ColaAPIClient.getClient();
         [
