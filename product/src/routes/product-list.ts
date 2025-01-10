@@ -7,6 +7,7 @@ import {
   Product,
   ProductDoc,
   Merchant,
+  Supplier,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 import mongoose, { FilterQuery, Types } from "@ezdev/core/lib/mongoose";
@@ -223,13 +224,34 @@ router.get(
       }
 
       const merchant = await Merchant.findById(merchantId as string);
+      if (!merchant) {
+        return res.status(StatusCodes.NOT_FOUND).send({
+          message: "Merchant not found.",
+        });
+      }
 
-      if (promotion || discount) {
+      const supplier = await Supplier.findById(customerId as string);
+      if (!supplier) {
+        return res.status(StatusCodes.NOT_FOUND).send({
+          message: "Supplier not found.",
+        });
+      }
+
+      const holdingKey = supplier?.holdingKey;
+      const tsId = merchant?.tradeShops?.find(
+        (shop) => shop.holdingKey === holdingKey
+      )?.tsId;
+
+      if ((promotion || discount) && tsId) {
         const currentDate = new Date();
         const promoQuery: FilterQuery<any> = {
+          customerId: new Types.ObjectId(customerId as string),
           isActive: true,
           startDate: { $lte: currentDate },
           endDate: { $gte: currentDate },
+          tradeshops: {
+            $in: [Number(tsId)].filter(Boolean),
+          },
         };
 
         let merchantTradeshopId: string | null = null;
@@ -250,10 +272,13 @@ router.get(
           promoQuery.customerId = new Types.ObjectId(query.customerId);
         const promoConditions: FilterQuery<any>[] = [];
 
-        if (promotion)
-          promoConditions.push({ promoTypeId: { $in: [1, 2, 5, 6] } });
-
-        if (discount) promoConditions.push({ promoTypeId: { $in: [3, 4] } });
+        if (promotion && discount) {
+          promoQuery.promoTypeId = { $in: [1, 2, 5, 6, 3, 4] };
+        } else if (promotion) {
+          promoQuery.promoTypeId = { $in: [1, 2, 5, 6] };
+        } else if (discount) {
+          promoQuery.promoTypeId = { $in: [3, 4] };
+        }
 
         if (promoConditions.length > 0) {
           promoQuery.$or = promoConditions;
