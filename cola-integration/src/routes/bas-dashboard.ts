@@ -192,7 +192,7 @@ router.get("/bas/dashboard-data", async (req: Request, res: Response) => {
             tradeshopid: merchantBasId,
           }),
         ]);
-        console.log(salesPerformance);
+
         orderList = orderList.filter(
           (item: any) => item.businesstype === businessType
         );
