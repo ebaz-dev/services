@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { query } from "express-validator";
 import { validateRequest, requireAuth, Promo } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import mongoose, { FilterQuery }  from "@ezdev/core/lib/mongoose";
+import mongoose, { FilterQuery } from "@ezdev/core/lib/mongoose";
 
 const router = express.Router();
 
@@ -50,7 +50,7 @@ router.get(
       const limitNumber = limit === "all" ? 0 : parseInt(limit as string, 10);
       const skip = limit === "all" ? 0 : (pageNumber - 1) * limitNumber;
 
-      const query: FilterQuery<typeof Promo> = {};
+      const query: FilterQuery<typeof Promo> = { isActive: true };
       if (ids) {
         const idsArray = (ids as string)
           .split(",")

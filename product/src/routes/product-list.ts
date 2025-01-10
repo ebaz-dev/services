@@ -9,7 +9,7 @@ import {
   Merchant,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import mongoose, { FilterQuery, Types }  from "@ezdev/core/lib/mongoose";
+import mongoose, { FilterQuery, Types } from "@ezdev/core/lib/mongoose";
 
 const router = express.Router();
 const validOrderByFields = [
@@ -142,8 +142,11 @@ router.get(
         promotion,
         favourite,
       } = req.query;
-      console.log("CHECK");
-      const query: FilterQuery<ProductDoc> = { isActive: true };
+
+      const query: FilterQuery<ProductDoc> = {
+        isActive: true,
+        isDeleted: false,
+      };
 
       if (name) query.name = { $regex: name, $options: "i" };
       if (barCode) query.barCode = { $regex: barCode, $options: "i" };
@@ -232,7 +235,7 @@ router.get(
         let merchantTradeshopId: string | null = null;
         const tradeShops = merchant?.tradeShops ?? [];
 
-        tradeShops.forEach((shop) => {
+        tradeShops.forEach((shop: any) => {
           const { tsId, holdingKey } = shop;
           if (customerId === totalCustomerId && holdingKey === "TD") {
             merchantTradeshopId = tsId;
@@ -260,7 +263,7 @@ router.get(
         }
 
         const promos = await Promo.find(promoQuery).select("products");
-        const promoProductIds = promos.flatMap((promo) => promo.products);
+        const promoProductIds = promos.flatMap((promo: any) => promo.products);
 
         if (promoProductIds.length === 0) {
           const total = 0;
