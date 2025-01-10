@@ -148,7 +148,7 @@ export class BasProductRecievedEventListener extends Listener<BasProductRecieved
         barCode: product.barCode,
         customerId: product.customerId.toString(),
         images: product.images || [],
-        prices: product.prices.map((price) => price.toString()),
+        prices: product.prices.map((price: any) => price.toString()),
         inCase: product.inCase,
         isActive: product.isActive,
       });

@@ -8,7 +8,7 @@ import {
   ProductCategory,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import mongoose  from "@ezdev/core/lib/mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 import slugify from "slugify";
 import { ProductUpdatedPublisher } from "../events/publisher/product-updated-publisher";
 import { natsWrapper } from "../nats-wrapper";
@@ -112,7 +112,7 @@ router.put(
           product.favourite = [];
         }
 
-        const isFavouritePresent = product.favourite.some((fav) =>
+        const isFavouritePresent = product.favourite.some((fav: any) =>
           fav.equals(addFavourite)
         );
 
@@ -124,7 +124,7 @@ router.put(
       if (deleteFavourite) {
         if (product.favourite) {
           product.favourite = product.favourite.filter(
-            (fav) => !fav.equals(deleteFavourite)
+            (fav: any) => !fav.equals(deleteFavourite)
           );
         }
       }

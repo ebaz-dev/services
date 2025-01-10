@@ -767,6 +767,7 @@ async function getMerchantProducts(
   ) => {
     const allSupplierProducts = await Product.find({
       customerId: supplierId,
+      isDeleted: false,
     });
 
     const productMap = new Map<number, Types.ObjectId>();
@@ -777,6 +778,7 @@ async function getMerchantProducts(
           data.customerId instanceof mongoose.Types.ObjectId
             ? data.customerId.toString()
             : data.customerId;
+
         const supplierIdStr =
           supplierId instanceof mongoose.Types.ObjectId
             ? supplierId.toString()
@@ -789,15 +791,14 @@ async function getMerchantProducts(
     });
 
     return products
-      .map((product) => {
-        const productId = productMap.get(product.productid);
+      .map((item) => {
+        const productId = productMap.get(item.productid);
 
         if (productId) {
           return {
             productId: new mongoose.Types.ObjectId(productId),
-            price: product.price,
-            quantity:
-              product.quantity < (stockMin ?? 1000) ? 0 : product.quantity,
+            price: item.price,
+            quantity: item.quantity < (stockMin ?? 1000) ? 0 : item.quantity,
           };
         }
         return null;
@@ -841,7 +842,8 @@ async function getMerchantProducts(
 
     if (isAgMgSupplier) {
       receivedProducts = receivedProducts.filter(
-        (item: any) => item.business === businessType?.toUpperCase()
+        // (item: any) => item.business === businessType?.toUpperCase()
+        (item: any) => item.business === businessType
       );
     }
 

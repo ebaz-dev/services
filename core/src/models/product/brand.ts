@@ -41,7 +41,7 @@ const brandSchema = new Schema<BrandDoc>(
     },
     image: {
       type: String,
-      required: true,
+      required: false,
     },
     isActive: {
       type: Boolean,
