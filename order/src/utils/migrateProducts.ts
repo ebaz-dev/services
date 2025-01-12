@@ -272,7 +272,7 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
     }
   });
   products.map((product: any) => {
-    product.price = Number(product.price.toFixed(4));
+    product.price = Number(product.price.toFixed(2));
     product.totalPrice = product.price * product.quantity;
     product.totalBasePrice = product.basePrice * product.quantity;
   });
@@ -339,7 +339,7 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
     qualifiedPromos,
     tierDiscount: {
       list: tierDiscount,
-      tierDiscountAmount: Number(tierDiscountAmount.toFixed(4)),
+      tierDiscountAmount: Number(tierDiscountAmount.toFixed(2)),
       tierDiscountPercent,
     },
   };
