@@ -20,6 +20,8 @@ const validOrderByFields = [
   "promotion",
   "sizeIncreased",
   "sizeDecreased",
+  "priceIncreased",
+  "priceDecreased",
 ];
 
 const totalCustomerId = "66f12d655e36613db5743430";
@@ -101,7 +103,7 @@ router.get(
       .isString()
       .custom((value) => validOrderByFields.includes(value.split(":")[0]))
       .withMessage(
-        "Order by must be one of the following: priority,favourite ,discount ,promotion ,sizeIncreased, sizeDecreased"
+        "Order by must be one of the following: priority,favourite ,discount ,promotion ,sizeIncreased, sizeDecreased, priceIncreased, priceDecreased"
       ),
     query("inCase")
       .optional()
@@ -215,6 +217,9 @@ router.get(
           if (key === "sizeIncreased" || key === "sizeDecreased") {
             const sizeOrder = key === "sizeIncreased" ? 1 : -1;
             sort[`attributes.value`] = sizeOrder;
+          } else if (key === "priceIncreased" || key === "priceDecreased") {
+            const priceOrder = key === "priceIncreased" ? 1 : -1;
+            sort[`price`] = priceOrder;
           } else {
             sort[key] = order === "desc" ? -1 : 1;
           }
