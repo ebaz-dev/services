@@ -84,9 +84,6 @@ export const getBasMerchantProducts = async (
       matchStage["productDetails.promos.promoTypeId"] = { $in: promoTypeIds };
     }
 
-    console.log("promoTypeIds:", promoTypeIds);
-    console.log("matchStage:", JSON.stringify(matchStage, null, 2));
-
     const products = await MerchantProducts.aggregate([
       { $match: { merchantId, supplierId } },
       { $unwind: "$products" },
