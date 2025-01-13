@@ -34,6 +34,10 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
         businessTypeId: new Types.ObjectId(),
       },
     });
+  console.log("***************************");
+  console.log(result);
+  console.log("***************************");
+
   const products: any = [];
   let totalPrice = 0;
   cart.products.map(async (item, index) => {
