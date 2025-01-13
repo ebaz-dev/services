@@ -120,6 +120,8 @@ export const getBasMerchantProducts = async (
             },
             {
               $project: {
+                _id: 0,
+                id: "$_id",
                 name: 1,
                 promoNo: 1,
                 tresholdAmount: 1,
