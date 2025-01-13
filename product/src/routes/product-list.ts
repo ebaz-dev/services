@@ -3,14 +3,13 @@ import { query } from "express-validator";
 import {
   validateRequest,
   requireAuth,
-  Promo,
   Product,
   ProductDoc,
   Merchant,
   Supplier,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import mongoose, { FilterQuery, Types } from "@ezdev/core/lib/mongoose";
+import mongoose, { FilterQuery } from "@ezdev/core/lib/mongoose";
 
 const router = express.Router();
 const validOrderByFields = [
@@ -20,8 +19,8 @@ const validOrderByFields = [
   "promotion",
   "sizeIncreased",
   "sizeDecreased",
-  "priceIncreased",
-  "priceDecreased",
+  "ascending",
+  "descending",
 ];
 
 const totalCustomerId = "66f12d655e36613db5743430";
@@ -217,8 +216,8 @@ router.get(
           if (key === "sizeIncreased" || key === "sizeDecreased") {
             const sizeOrder = key === "sizeIncreased" ? 1 : -1;
             sort[`attributes.value`] = sizeOrder;
-          } else if (key === "priceIncreased" || key === "priceDecreased") {
-            const priceOrder = key === "priceIncreased" ? 1 : -1;
+          } else if (key === "ascending" || key === "descending") {
+            const priceOrder = key === "ascending" ? 1 : -1;
             sort[`price`] = priceOrder;
           } else {
             sort[key] = order === "desc" ? -1 : 1;
