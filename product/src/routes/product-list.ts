@@ -247,72 +247,12 @@ router.get(
         (shop) => shop.holdingKey === holdingKey
       )?.tsId;
 
-      if ((promotion || discount) && tsId) {
-        const currentDate = new Date();
-        const promoQuery: FilterQuery<any> = {
-          customerId: new Types.ObjectId(customerId as string),
-          isActive: true,
-          startDate: { $lte: currentDate },
-          endDate: { $gte: currentDate },
-          tradeshops: {
-            $in: [Number(tsId)].filter(Boolean),
-          },
-        };
+      if (promotion) {
+        query.promotion = true;
+      }
 
-        let merchantTradeshopId: string | null = null;
-        const tradeShops = merchant?.tradeShops ?? [];
-
-        tradeShops.forEach((shop: any) => {
-          const { tsId, holdingKey } = shop;
-          if (customerId === totalCustomerId && holdingKey === "TD") {
-            merchantTradeshopId = tsId;
-          }
-
-          if (customerId === colaCustomerId && holdingKey === "MCSCC") {
-            merchantTradeshopId = tsId;
-          }
-        });
-
-        if (customerId)
-          promoQuery.customerId = new Types.ObjectId(query.customerId);
-        const promoConditions: FilterQuery<any>[] = [];
-
-        if (promotion && discount) {
-          promoQuery.promoTypeId = { $in: [1, 2, 5, 6, 3, 4] };
-        } else if (promotion) {
-          promoQuery.promoTypeId = { $in: [1, 2, 5, 6] };
-        } else if (discount) {
-          promoQuery.promoTypeId = { $in: [3, 4] };
-        }
-
-        if (promoConditions.length > 0) {
-          promoQuery.$or = promoConditions;
-        }
-
-        if (merchantTradeshopId !== null) {
-          promoQuery.tradeshops = { $in: [parseInt(merchantTradeshopId)] };
-        }
-
-        const promos = await Promo.find(promoQuery).select("products");
-        const promoProductIds = promos.flatMap((promo: any) => promo.products);
-
-        if (promoProductIds.length === 0) {
-          const total = 0;
-          return res.status(StatusCodes.OK).send({
-            data: [],
-            total: 0,
-            totalPages: limit === "all" ? 1 : Math.ceil(total / limitNumber),
-            currentPage: limit === "all" ? 1 : pageNumber,
-          });
-        } else {
-          if (query._id) {
-            query._id = {
-              $in: [...promoProductIds, ...(query._id as any).$in],
-            };
-          } else {
-            query._id = { $in: promoProductIds };
-          }
-        }
+      if (discount) {
+        query.discount = true;
       }
 
       if (favourite && merchantId) {
