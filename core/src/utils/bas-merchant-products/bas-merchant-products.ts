@@ -81,10 +81,10 @@ export const getBasMerchantProducts = async (
       if (query.discount) {
         promoTypeIds.push(3, 4);
       }
-      matchStage["productDetails.promos"] = {
-        $elemMatch: { promoTypeId: { $in: promoTypeIds } },
-      };
+
+      matchStage["productDetails.promos.promoTypeId"] = { $in: promoTypeIds };
     }
+
     const products = await MerchantProducts.aggregate([
       { $match: { merchantId, supplierId } },
       { $unwind: "$products" },
@@ -97,46 +97,12 @@ export const getBasMerchantProducts = async (
         },
       },
       { $unwind: "$productDetails" },
-      { $match: matchStage },
-      {
-        $addFields: {
-          quantityZero: { $cond: [{ $eq: ["$products.quantity", 0] }, 1, 0] },
-          adjustedPrice: {
-            price: "$products.price",
-            cost: 0,
-          },
-          inventory: {
-            totalStock: 0,
-            reservedStock: 0,
-            availableStock: "$products.quantity",
-            id: "$productDetails.inventoryId",
-          },
-        },
-      },
-      {
-        $lookup: {
-          from: "brands",
-          localField: "productDetails.brandId",
-          foreignField: "_id",
-          as: "brand",
-        },
-      },
-      { $unwind: { path: "$brand", preserveNullAndEmptyArrays: true } },
-      {
-        $lookup: {
-          from: "customers",
-          localField: "productDetails.customerId",
-          foreignField: "_id",
-          as: "customer",
-        },
-      },
-      { $unwind: { path: "$customer", preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: "promos",
           localField: "products.productId",
           foreignField: "products",
-          as: "promos",
+          as: "productDetails.promos",
           pipeline: [
             {
               $match: {
@@ -177,6 +143,40 @@ export const getBasMerchantProducts = async (
           ],
         },
       },
+      { $match: matchStage },
+      {
+        $addFields: {
+          quantityZero: { $cond: [{ $eq: ["$products.quantity", 0] }, 1, 0] },
+          adjustedPrice: {
+            price: "$products.price",
+            cost: 0,
+          },
+          inventory: {
+            totalStock: 0,
+            reservedStock: 0,
+            availableStock: "$products.quantity",
+            id: "$productDetails.inventoryId",
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "brands",
+          localField: "productDetails.brandId",
+          foreignField: "_id",
+          as: "brand",
+        },
+      },
+      { $unwind: { path: "$brand", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "customers",
+          localField: "productDetails.customerId",
+          foreignField: "_id",
+          as: "customer",
+        },
+      },
+      { $unwind: { path: "$customer", preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: "categories",
@@ -236,7 +236,7 @@ export const getBasMerchantProducts = async (
                 logo: "$customer.logo",
                 bankAccounts: "$customer.bankAccounts",
               },
-              promos: "$promos",
+              promos: "$productDetails.promos",
               categories: "$categories",
               inCase: "$productDetails.inCase",
               splitSale: "$productDetails.splitSale",
