@@ -73,16 +73,18 @@ export const getBasMerchantProducts = async (
       matchStage["productDetails.favourite"] = query.favourite;
     }
 
+    let promoTypeIds: number[] = [];
     if (query.promotion || query.discount) {
-      if (query.promotion && query.discount) {
-        matchStage["promos.promoTypeId"] = { $in: [1, 2, 5, 6, 3, 4] };
-      } else if (query.promotion) {
-        matchStage["promos.promoTypeId"] = { $in: [1, 2, 5, 6] };
-      } else if (query.discount) {
-        matchStage["promos.promoTypeId"] = { $in: [3, 4] };
+      if (query.promotion) {
+        promoTypeIds.push(1, 2, 5, 6);
       }
+      if (query.discount) {
+        promoTypeIds.push(3, 4);
+      }
+      matchStage["productDetails.promos"] = {
+        $elemMatch: { promoTypeId: { $in: promoTypeIds } },
+      };
     }
-
     const products = await MerchantProducts.aggregate([
       { $match: { merchantId, supplierId } },
       { $unwind: "$products" },
@@ -143,6 +145,9 @@ export const getBasMerchantProducts = async (
                 endDate: { $gte: new Date() },
                 isActive: true,
                 tradeshops: { $in: [Number(tsId)] },
+                ...(promoTypeIds.length > 0 && {
+                  promoTypeId: { $in: promoTypeIds },
+                }),
               },
             },
             {

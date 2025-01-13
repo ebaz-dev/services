@@ -18,6 +18,7 @@ import { TotalAPIClient } from "../../utils/bas-api-clients/total-api-client";
 import { AnungooAPIClient } from "../../utils/bas-api-clients/anungoo-api-client";
 import { MerchantProducts } from "./merchant-products";
 import { Vendor } from "./vendor";
+import { getBasMerchantProducts } from "../../utils/bas-merchant-products/bas-merchant-products";
 
 interface AdjustedPrice {
   prices: {
@@ -354,7 +355,8 @@ productSchema.statics.findWithAdjustedPrice = async function (
   params: IfindWithAdjustedPrice
 ) {
   const { merchantId } = params.merchant;
-  let { customerId } = params.query;
+  const { customerId } = params.query;
+  const { skip, limit, sort, query } = params;
 
   const merchant = await Merchant.findById(merchantId);
   if (!merchant) throw new Error("Merchant not found");
@@ -362,121 +364,35 @@ productSchema.statics.findWithAdjustedPrice = async function (
   const supplier = await Supplier.findById(customerId);
   if (!supplier) throw new Error("Supplier not found");
 
-  const supplierHoldingKey = supplier?.holdingKey;
-  const isIntegratedSupplier = supplier?.holdingKey ? true : false;
-  const stockMin = supplier.stockMin;
-  const businessType = supplier.businessType;
-  const isAgMgSupplier =
-    supplierHoldingKey === "AG" || supplierHoldingKey === "MG";
+  const isBasIntegratedSupplier =
+    supplier.holdingKey &&
+    ["AG", "MG", "TD", "MCSCC"].includes(supplier.holdingKey);
 
-  const merchantTradeshops = merchant.tradeShops || [];
-
-  let merchantTs = null;
-  let vendorId = null;
-  let apiCompany = null;
-  let isTdMerchant = false;
-
-  for (const shop of merchantTradeshops) {
-    if (shop.holdingKey === supplier.holdingKey) {
-      merchantTs = shop;
-    }
-
-    if (shop.holdingKey === "TD") {
-      isTdMerchant = true;
-    }
-
-    if (merchantTs && isTdMerchant) {
-      break;
-    }
-  }
-
-  const tsId = merchantTs?.tsId;
-
-  if (isTdMerchant) {
-    const totalSupplier = await Supplier.findOne({
-      holdingKey: "TD",
-    });
-
-    vendorId = customerId;
-
-    const vendor = await Vendor.findOne({
-      supplierId: totalSupplier?._id,
-      originSupplierId: customerId,
-    });
-
-    customerId = totalSupplier?._id;
-    params.query.customerId = customerId;
-
-    vendorId = vendor?._id;
-    apiCompany = vendor?.apiCompany;
-  }
-
-  const apiClient = isTdMerchant
-    ? TotalAPIClient
-    : supplierHoldingKey === "MCSCC"
-    ? ColaAPIClient
-    : supplierHoldingKey === "AG" || supplierHoldingKey === "MG"
-    ? AnungooAPIClient
-    : null;
-
-  let activeProductIds: any = [];
-  let activeProducts: any = [];
-
-  if (isIntegratedSupplier && tsId) {
-    activeProducts = await getMerchantProducts(
-      apiClient,
-      merchantId,
-      customerId,
-      tsId,
-      vendorId as Types.ObjectId | undefined,
-      apiCompany as string | undefined,
-      stockMin,
-      businessType,
-      isAgMgSupplier
+  if (isBasIntegratedSupplier) {
+    return await getBasMerchantProducts(
+      merchant,
+      supplier,
+      skip,
+      limit,
+      sort,
+      query
     );
-  }
-
-  activeProductIds = activeProducts.map((product: any) => product.productId);
-
-  if (activeProductIds.length === 0) {
-    return { products: [], count: 0 };
-  }
-
-  let query = { ...params.query };
-
-  if (activeProductIds.length > 0) {
-    query._id = query._id?.$in
-      ? {
-          $in: query._id.$in.filter((id: any) =>
-            activeProductIds.some((activeId: any) => activeId.equals(id))
-          ),
-        }
-      : { $in: activeProductIds };
-
-    if (!query._id.$in.length) {
-      return { products: [], count: 0 };
-    }
-  }
-
-  if (isTdMerchant && vendorId) {
-    query.vendorId = vendorId;
-  }
-
-  const count = await this.countDocuments(query);
-  const products = await this.find(query)
-    .skip(params.skip)
-    .limit(params.limit)
-    .sort(params.sort)
-    .populate("inventory", "totalStock reservedStock availableStock")
-    .populate("brand", "name slug customerId image")
-    .populate("categories", "name slug")
-    .populate(
-      "customer",
-      "name type regNo categoryId userId address phone email logo bankAccounts"
-    )
-    .populate({
-      path: "promos",
-      select: `
+  } else {
+    const count = await this.countDocuments(query);
+    const products = await this.find(query)
+      .skip(skip)
+      .limit(limit)
+      .sort(sort)
+      .populate("inventory", "totalStock reservedStock availableStock")
+      .populate("brand", "name slug customerId image")
+      .populate("categories", "name slug")
+      .populate(
+        "customer",
+        "name type regNo categoryId userId address phone email logo bankAccounts"
+      )
+      .populate({
+        path: "promos",
+        select: `
         name 
         promoNo 
         tresholdAmount 
@@ -498,50 +414,27 @@ productSchema.statics.findWithAdjustedPrice = async function (
         thirdPartyData.thirdPartyPromoType 
         thirdPartyData.thirdPartyPromoTypeCode
         `,
-      match: {
-        startDate: { $lte: new Date() },
-        endDate: { $gte: new Date() },
-        isActive: true,
-        tradeshops: {
-          $in: [tsId].filter(Boolean),
+        match: {
+          startDate: { $lte: new Date() },
+          endDate: { $gte: new Date() },
+          isActive: true,
         },
-      },
-    });
+      });
 
-  if (products.length === 0) {
+    if (products.length === 0) {
+      return { products, count };
+    }
+
+    const adjustedPrices = async (product: any) => {
+      product.adjustedPrice = (
+        await product.getAdjustedPrice(params.merchant)
+      ).prices;
+    };
+
+    await Promise.all(products.map(adjustedPrices));
+
     return { products, count };
   }
-
-  const adjustedPrices = async (product: any) => {
-    product.adjustedPrice = (
-      await product.getAdjustedPrice(params.merchant)
-    ).prices;
-  };
-
-  if (!isIntegratedSupplier) {
-    await Promise.all(products.map(adjustedPrices));
-  } else {
-    const productsWithPriceAndQuantity = products.map((product: any) => {
-      const activeProduct = activeProducts.find((p: any) =>
-        p.productId.equals(product._id)
-      );
-      initializeAdjustedPrice(product);
-      initializeInventory(product);
-
-      if (activeProduct) {
-        product.adjustedPrice.price = activeProduct.price;
-        product.adjustedPrice.cost = 0;
-        product.inventory.availableStock = activeProduct.quantity;
-
-        return product;
-      }
-
-      return product;
-    });
-
-    return { products: productsWithPriceAndQuantity, count };
-  }
-  return { products, count };
 };
 
 productSchema.statics.findOneWithAdjustedPrice = async function (
