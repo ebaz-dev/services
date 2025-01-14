@@ -170,6 +170,7 @@ interface ProductDoc extends Document {
   promos?: Promo[];
   favourite?: Types.ObjectId[];
   isDeleted?: boolean;
+  minAmount?: number;
 }
 
 interface ProductModel extends Model<ProductDoc> {
@@ -288,6 +289,10 @@ const productSchema = new Schema<ProductDoc>(
     },
     isDeleted: {
       type: Boolean,
+      required: false,
+    },
+    minAmount: {
+      type: Number,
       required: false,
     },
   },

@@ -202,10 +202,28 @@ export const getBasMerchantProducts = async (
         },
       },
       {
+        $addFields: {
+          sizeValue: {
+            $arrayElemAt: [
+              {
+                $filter: {
+                  input: "$productDetails.attributes",
+                  as: "attribute",
+                  cond: { $eq: ["$$attribute.key", "size"] },
+                },
+              },
+              0,
+            ],
+          },
+        },
+      },
+      {
         $sort: {
           quantityZero: 1, // Move quantity = 0 to the end
           ...(sortKey === "price"
             ? { "products.price": sortOrder }
+            : sortKey === "attribute.size"
+            ? { "sizeValue.value": sortOrder }
             : { "productDetails.priority": sortOrder }),
         },
       },
