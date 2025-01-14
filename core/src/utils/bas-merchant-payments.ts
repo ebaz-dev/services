@@ -33,7 +33,7 @@ const basMerchantPayments = async (
 
     let filteredProfile: MerchantProfile | undefined;
 
-    if (supplier === "MCSCC") {
+    if (supplier === "MCSCC" || supplier === "TD") {
       filteredProfile = merchantProfile[0];
     } else {
       filteredProfile = merchantProfile.find(
