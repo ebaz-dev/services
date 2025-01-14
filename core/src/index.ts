@@ -134,6 +134,10 @@ export * from "./utils/bas-api-clients/total-api-client";
 export * from "./utils/is-expired";
 export * from "./utils/merchant-payments";
 export * from "./utils/recognize-phone-number";
+export * from "./utils/bas-merchant-payments";
+export * from "./utils/bas-merchant-products/bas-client";
+export * from "./utils/bas-merchant-products/bas-merchant-products";
+export * from "./utils/bas-merchant-products/bas-product-match";
 
 // **Events
 export * from "./events/cola-integration/bas-product-event-subjects";
