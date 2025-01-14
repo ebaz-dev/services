@@ -133,6 +133,7 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
   // Processing promo products
   let giftProducts: any = [];
   let qualifiedPromos: any = [];
+
   promos = [
     ...new Map(
       promos.map((promo: any) => [
@@ -141,10 +142,12 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
       ])
     ).values(),
   ];
+
   promos.map((promo: any) => {
     if (promo) {
       let shouldQualify = false;
       let qualifiedPromo: any = false;
+
       qualifiedPromos.map((qPromo: any) => {
         if (
           promo.promoNo &&
@@ -225,6 +228,7 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
             item.promoNo === "" ||
             item.promoNo !== promo.promoNo
         );
+
         qualifiedPromos.push(promo);
       }
     }
@@ -278,7 +282,7 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
           return product;
         });
       }
-      delete promo.products;
+      // delete promo.products;
     }
   });
   products.map((product: any) => {
