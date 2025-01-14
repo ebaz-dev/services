@@ -23,7 +23,8 @@ const basMerchantPayments = async (
       "/api/ebazaar/getdataprofile",
       requestBody
     );
-    const merchantPayments = await fetchData(
+
+    let merchantPayments = await fetchData(
       apiClient,
       "/api/ebazaar/getdatapayment",
       requestBody
@@ -43,6 +44,12 @@ const basMerchantPayments = async (
 
     if (!filteredProfile) {
       throw new Error(`No matching profile found for business type: ${type}`);
+    }
+
+    if (supplier === "AG" || supplier === "MG") {
+      merchantPayments = merchantPayments.filter(
+        (item: any) => item.company === supplier
+      );
     }
 
     const payments = merchantPayments.map((p: any) => {
