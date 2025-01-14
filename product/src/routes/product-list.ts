@@ -215,7 +215,7 @@ router.get(
         if (validOrderByFields.includes(key)) {
           if (key === "sizeIncreased" || key === "sizeDecreased") {
             const sizeOrder = key === "sizeIncreased" ? 1 : -1;
-            sort[`attributes.value`] = sizeOrder;
+            sort[`attribute.size`] = sizeOrder;
           } else if (key === "ascending" || key === "descending") {
             const priceOrder = key === "ascending" ? 1 : -1;
             sort[`price`] = priceOrder;
