@@ -31,6 +31,7 @@ router.get(
   validateRequest,
   async (req: Request, res: Response) => {
     const orderTemplate = await OrderTemplate.findById(req.query.id);
+
     if (orderTemplate) {
       const data = await prepareTemplate(
         orderTemplate,
@@ -72,7 +73,8 @@ const prepareTemplate = async (
           giftQuantity: 0,
           totalPrice: product.quantity * price,
           stock: productPrice.inventory?.availableStock,
-          inCase: productPrice.inCase,
+          inCase: productPrice.splitSale ? 1 : productPrice.inCase,
+          splitSale: productPrice.splitSale,
         };
       } catch (error) {
         console.log("error", error);
