@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import mongoose, { Types }   from "@ezdev/core/lib/mongoose";
+import mongoose, { Types } from "@ezdev/core/lib/mongoose";
 import {
   Cart,
   CartEventSubjects,
@@ -102,7 +102,7 @@ async function checkInventory(
       );
 
       const merchantProduct = merchantProducts.find(
-        (mp: any) => mp._id.toString() === item.id.toString()
+        (mp: any) => mp.id.toString() === item.id.toString()
       );
 
       if (
