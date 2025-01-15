@@ -27,7 +27,6 @@ jobs:
         with:
           script: |
             try {
-              // Get repository name from full repository path
               const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
               
               console.log('Repository context:', {
@@ -36,19 +35,9 @@ jobs:
                 sha: '${{ inputs.version }}'
               });
 
-              // Initialize empty array for services
               let deployedServices = [];
 
-              // First check if the commit exists
-              const { data: commit } = await github.rest.repos.getCommit({
-                owner: owner,
-                repo: repo,
-                ref: '${{ inputs.version }}'
-              });
-              
-              console.log('Checking commit:', commit.sha);
-              
-              // Then get workflow runs
+              // Get all workflows
               const { data: workflows } = await github.rest.actions.listRepoWorkflows({
                 owner: owner,
                 repo: repo
@@ -56,64 +45,62 @@ jobs:
               
               console.log('Available workflows:', workflows.workflows.map(w => w.path));
               
-              const devWorkflow = workflows.workflows.find(w => w.path === '.github/workflows/dev-deploy.yml');
-              if (!devWorkflow) {
-                console.log('dev-deploy.yml workflow not found');
-                core.setOutput('services', '[]');
-                return;
-              }
-              
-              const workflow_runs = await github.rest.actions.listWorkflowRuns({
-                owner: owner,
-                repo: repo,
-                workflow_id: devWorkflow.id,
-                sha: '${{ inputs.version }}'
-              });
-              
-              console.log('Found workflow runs:', workflow_runs.data);
-              
-              const run = workflow_runs.data.workflow_runs[0];
-              if (!run) {
-                console.log('No dev deployment found for this SHA');
+              // Find both automatic and manual deploy workflows
+              const devWorkflows = workflows.workflows.filter(w => 
+                w.path === '.github/workflows/dev-deploy.yml' || 
+                w.path === '.github/workflows/dev-manual-deploy.yml'
+              );
+
+              if (devWorkflows.length === 0) {
+                console.log('No deployment workflows found');
                 core.setOutput('services', '[]');
                 return;
               }
 
-              console.log('Using workflow run:', run.id);
+              // Check each workflow for deployments
+              for (const workflow of devWorkflows) {
+                console.log(`Checking workflow: ${workflow.path}`);
+                
+                const workflow_runs = await github.rest.actions.listWorkflowRuns({
+                  owner: owner,
+                  repo: repo,
+                  workflow_id: workflow.id,
+                  sha: '${{ inputs.version }}'
+                });
+                
+                const run = workflow_runs.data.workflow_runs[0];
+                if (!run) {
+                  console.log(`No deployment found for this SHA in ${workflow.path}`);
+                  continue;
+                }
+
+                console.log(`Found workflow run in ${workflow.path}:`, run.id);
+                
+                const jobs = await github.rest.actions.listJobsForWorkflowRun({
+                  owner: owner,
+                  repo: repo,
+                  run_id: run.id
+                });
+                
+                const services = jobs.data.jobs
+                  .filter(job => job.name.includes('build-and-deploy'))
+                  .map(job => {
+                    const cleanName = job.name.replace(/[\n\r\s]+/g, ' ').trim();
+                    const match = cleanName.match(/build-and-deploy \(([^)]+)\)/);
+                    return match ? match[1].trim() : null;
+                  })
+                  .filter(Boolean);
+
+                if (services.length > 0) {
+                  deployedServices = [...new Set([...deployedServices, ...services])];
+                  console.log(`Found services in ${workflow.path}:`, services);
+                }
+              }
               
-              const jobs = await github.rest.actions.listJobsForWorkflowRun({
-                owner: owner,
-                repo: repo,
-                run_id: run.id
-              });
-              
-              console.log('All jobs:', jobs.data.jobs.map(j => ({
-                name: j.name,
-                status: j.status,
-                conclusion: j.conclusion
-              })));
-              
-              deployedServices = jobs.data.jobs
-                .filter(job => job.name.includes('build-and-deploy'))
-                .map(job => {
-                  console.log('Processing job name:', job.name);
-                  // More aggressive cleanup and matching
-                  const cleanName = job.name.replace(/[\n\r\s]+/g, ' ').trim();
-                  console.log('Cleaned job name:', cleanName);
-                  const match = cleanName.match(/build-and-deploy \(([^)]+)\)/);
-                  console.log('Match result:', match);
-                  return match ? match[1].trim() : null;
-                })
-                .filter(Boolean);
-              
-              console.log('Raw job names:', jobs.data.jobs.map(j => j.name));
-              console.log('After filter:', jobs.data.jobs.filter(job => job.name.includes('build-and-deploy')).map(j => j.name));
               console.log('Final detected services:', deployedServices);
               
               if (deployedServices.length === 0) {
-                console.log('No build-and-deploy jobs found in the workflow run');
-                // List all job names to help debug
-                console.log('Available job names:', jobs.data.jobs.map(j => j.name));
+                console.log('No build-and-deploy jobs found in any workflow run');
               }
               
               core.setOutput('services', JSON.stringify(deployedServices));
@@ -167,6 +154,7 @@ jobs:
           script: |
             try {
               const service = '${{ matrix.service }}';
+              // Get repository name from environment variable
               const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
               
               console.log('Checking deployment for:', {
