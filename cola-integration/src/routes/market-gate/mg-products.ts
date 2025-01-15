@@ -95,7 +95,6 @@ router.get("/marketgate/product-list", async (req: Request, res: Response) => {
           supplierId: supplierId as Types.ObjectId,
           basId: item.productid,
           productName: item.productname,
-          brandName: item.brandname,
           incase: item.incase,
           sectorName: item.sectorname,
           barcode: sanitizedBarcode,
@@ -131,10 +130,6 @@ router.get("/marketgate/product-list", async (req: Request, res: Response) => {
 
         if (item.name !== product.productname) {
           updatedFields.productName = product.productname;
-        }
-
-        if (!item.brandId) {
-          updatedFields.brandName = product.brandname;
         }
 
         if (existingCapacity !== capacity && capacity !== 0) {

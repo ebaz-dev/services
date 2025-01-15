@@ -158,6 +158,7 @@ export const getBasMerchantProducts = async (
             availableStock: "$products.quantity",
             id: "$productDetails.inventoryId",
           },
+          brand: { $ifNull: [{ $arrayElemAt: ["$brand", 0] }, {}] },
         },
       },
       {
@@ -254,11 +255,16 @@ export const getBasMerchantProducts = async (
               isDeleted: "$productDetails.isDeleted",
               inventory: "$inventory",
               brand: {
-                name: "$brand.name",
-                slug: "$brand.slug",
-                customerId: "$brand.customerId",
-                image: "$brand.image",
-                id: "$productDetails.brandId",
+                $ifNull: [
+                  {
+                    name: "$brand.name",
+                    slug: "$brand.slug",
+                    customerId: "$brand.customerId",
+                    image: "$brand.image",
+                    id: "$productDetails.brandId",
+                  },
+                  {},
+                ],
               },
               categories: "$categories",
               customer: {
