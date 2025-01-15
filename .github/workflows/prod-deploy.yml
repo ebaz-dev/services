@@ -167,7 +167,6 @@ jobs:
           script: |
             try {
               const service = '${{ matrix.service }}';
-              // Get repository name from environment variable
               const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
               
               console.log('Checking deployment for:', {
@@ -177,7 +176,7 @@ jobs:
                 sha: '${{ inputs.version }}'
               });
               
-              // First get all workflows
+              // Get all workflows
               const { data: workflows } = await github.rest.actions.listRepoWorkflows({
                 owner: owner,
                 repo: repo
@@ -185,52 +184,60 @@ jobs:
               
               console.log('Available workflows:', workflows.workflows.map(w => w.path));
               
-              // Find the dev-deploy workflow
-              const devWorkflow = workflows.workflows.find(w => w.path === '.github/workflows/dev-deploy.yml');
-              if (!devWorkflow) {
-                throw new Error('dev-deploy.yml workflow not found');
-              }
-              
-              // Get workflow runs for this specific workflow
-              const { data: runs } = await github.rest.actions.listWorkflowRuns({
-                owner: owner,
-                repo: repo,
-                workflow_id: devWorkflow.id,
-                status: 'completed',
-                conclusion: 'success'
-              });
-              
-              console.log('Found workflow runs:', runs.total_count);
-              
-              // Find the run with matching SHA
-              const devDeployment = runs.workflow_runs.find(run => 
-                run.head_sha === '${{ inputs.version }}'
-              );
-
-              if (!devDeployment) {
-                core.setFailed(`No successful dev deployment found for SHA: ${{ inputs.version }}`);
-                return;
-              }
-              
-              console.log('Found matching deployment:', devDeployment.id);
-              
-              // Get the jobs for this run to verify the service was deployed
-              const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
-                owner: owner,
-                repo: repo,
-                run_id: devDeployment.id
-              });
-              
-              const serviceJob = jobs.jobs.find(job => 
-                job.name.includes(`build-and-deploy (${service}`)
+              // Find both automatic and manual deploy workflows
+              const devWorkflows = workflows.workflows.filter(w => 
+                w.path === '.github/workflows/dev-deploy.yml' || 
+                w.path === '.github/workflows/dev-manual-deploy.yml'
               );
               
-              if (!serviceJob || serviceJob.conclusion !== 'success') {
+              if (devWorkflows.length === 0) {
+                throw new Error('No deployment workflows found');
+              }
+              
+              // Check each workflow for successful deployments
+              let serviceDeployed = false;
+              
+              for (const workflow of devWorkflows) {
+                console.log(`Checking workflow: ${workflow.path}`);
+                
+                const { data: runs } = await github.rest.actions.listWorkflowRuns({
+                  owner: owner,
+                  repo: repo,
+                  workflow_id: workflow.id,
+                  status: 'completed',
+                  conclusion: 'success'
+                });
+                
+                // Find the run with matching SHA
+                const devDeployment = runs.workflow_runs.find(run => 
+                  run.head_sha === '${{ inputs.version }}'
+                );
+                
+                if (devDeployment) {
+                  console.log(`Found matching deployment in ${workflow.path}:`, devDeployment.id);
+                  
+                  // Get the jobs for this run
+                  const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
+                    owner: owner,
+                    repo: repo,
+                    run_id: devDeployment.id
+                  });
+                  
+                  const serviceJob = jobs.jobs.find(job => 
+                    job.name.includes(`build-and-deploy (${service}`)
+                  );
+                  
+                  if (serviceJob && serviceJob.conclusion === 'success') {
+                    serviceDeployed = true;
+                    console.log(`Verified successful dev deployment for ${service} in ${workflow.path}`);
+                    break;
+                  }
+                }
+              }
+              
+              if (!serviceDeployed) {
                 core.setFailed(`Service ${service} was not successfully deployed to dev`);
-                return;
               }
-              
-              console.log(`Verified successful dev deployment for ${service}`);
               
             } catch (error) {
               console.error('Error checking deployment:', error);
