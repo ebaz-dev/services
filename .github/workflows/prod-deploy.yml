@@ -35,15 +35,11 @@ jobs:
                 sha: '${{ inputs.version }}'
               });
 
-              let deployedServices = [];
-
               // Get all workflows
               const { data: workflows } = await github.rest.actions.listRepoWorkflows({
                 owner: owner,
                 repo: repo
               });
-              
-              console.log('Available workflows:', workflows.workflows.map(w => w.path));
               
               // Find both automatic and manual deploy workflows
               const devWorkflows = workflows.workflows.filter(w => 
@@ -57,53 +53,57 @@ jobs:
                 return;
               }
 
-              // Check each workflow for deployments
+              let deployedServices = [];
+
+              // Check each workflow for the specific SHA deployment
               for (const workflow of devWorkflows) {
                 console.log(`Checking workflow: ${workflow.path}`);
                 
-                const workflow_runs = await github.rest.actions.listWorkflowRuns({
+                const { data: runs } = await github.rest.actions.listWorkflowRuns({
                   owner: owner,
                   repo: repo,
                   workflow_id: workflow.id,
-                  sha: '${{ inputs.version }}'
+                  status: 'completed',
+                  conclusion: 'success'
                 });
                 
-                const run = workflow_runs.data.workflow_runs[0];
-                if (!run) {
-                  console.log(`No deployment found for this SHA in ${workflow.path}`);
+                // Find the exact run with matching SHA
+                const matchingRun = runs.workflow_runs.find(run => 
+                  run.head_sha === '${{ inputs.version }}'
+                );
+                
+                if (!matchingRun) {
+                  console.log(`No matching run found in ${workflow.path}`);
                   continue;
                 }
 
-                console.log(`Found workflow run in ${workflow.path}:`, run.id);
+                console.log(`Found matching run in ${workflow.path}:`, matchingRun.id);
                 
-                const jobs = await github.rest.actions.listJobsForWorkflowRun({
+                const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
                   owner: owner,
                   repo: repo,
-                  run_id: run.id
+                  run_id: matchingRun.id
                 });
                 
-                const services = jobs.data.jobs
+                // Extract only the build-and-deploy jobs
+                const services = jobs.jobs
                   .filter(job => job.name.includes('build-and-deploy'))
                   .map(job => {
-                    const cleanName = job.name.replace(/[\n\r\s]+/g, ' ').trim();
-                    const match = cleanName.match(/build-and-deploy \(([^)]+)\)/);
+                    const match = job.name.match(/build-and-deploy \(([^)]+)\)/);
                     return match ? match[1].trim() : null;
                   })
                   .filter(Boolean);
 
                 if (services.length > 0) {
-                  deployedServices = [...new Set([...deployedServices, ...services])];
-                  console.log(`Found services in ${workflow.path}:`, services);
+                  deployedServices = services;
+                  console.log(`Found services to deploy from ${workflow.path}:`, services);
+                  break; // Stop after finding the first matching workflow run
                 }
               }
               
-              console.log('Final detected services:', deployedServices);
-              
-              if (deployedServices.length === 0) {
-                console.log('No build-and-deploy jobs found in any workflow run');
-              }
-              
+              console.log('Final services to deploy:', deployedServices);
               core.setOutput('services', JSON.stringify(deployedServices));
+              
             } catch (error) {
               console.error('Error:', error);
               core.setOutput('services', '[]');
