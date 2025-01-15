@@ -14,8 +14,10 @@ export enum CustomerCode {
 interface BankAccountDoc extends Document {
   accountNumber: string;
   accountName: string;
+  bankName: string;
   bankId: Types.ObjectId;
 }
+
 const bankAccountSchema = new Schema<BankAccountDoc>(
   {
     accountNumber: {
@@ -23,6 +25,10 @@ const bankAccountSchema = new Schema<BankAccountDoc>(
       required: true,
     },
     accountName: {
+      type: String,
+      required: true,
+    },
+    bankName: {
       type: String,
       required: true,
     },
