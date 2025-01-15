@@ -61,6 +61,12 @@ export const getBasMerchantProducts = async (
       };
     }
 
+    if (query.categoryIds) {
+      matchStage["productDetails.categoryIds"] = {
+        $in: query.categoryIds.$in.map((id: string) => new Types.ObjectId(id)),
+      };
+    }
+
     if (query.barCode) {
       matchStage["productDetails.barCode"] = query.barCode;
     }
@@ -71,6 +77,10 @@ export const getBasMerchantProducts = async (
 
     if (query.favourite) {
       matchStage["productDetails.favourite"] = query.favourite;
+    }
+
+    if (query.attributes) {
+      matchStage["productDetails.attributes"] = query.attributes;
     }
 
     let promoTypeIds: number[] = [];
