@@ -12,6 +12,8 @@ interface BasProductData {
   incase: number;
   barcode: string;
   business?: string;
+  position?: string;
+  priority?: number;
 }
 
 interface ThirdPartyData {
