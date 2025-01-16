@@ -149,7 +149,7 @@ router.get(
         isActive: true,
         isDeleted: false,
       };
-
+      console.log("starting product list");
       if (name) query.name = { $regex: name, $options: "i" };
       if (barCode) query.barCode = { $regex: barCode, $options: "i" };
       if (sku) query.sku = { $regex: sku, $options: "i" };
