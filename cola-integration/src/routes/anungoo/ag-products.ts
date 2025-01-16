@@ -21,6 +21,7 @@ const router = express.Router();
 
 router.get("/anungoo/product-list", async (req: Request, res: Response) => {
   try {
+    console.log("starting anungoo product list fetch");
     const anungoo = await Supplier.find({
       type: "supplier",
       holdingKey: "AG",
