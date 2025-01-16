@@ -7,6 +7,7 @@ import {
   BasPromoSubjects,
 } from "@ezdev/core";
 import mongoose from "@ezdev/core/lib/mongoose";
+import slugify from "slugify";
 
 export class BasPromoUpdatedEventListener extends Listener<BasPromoUpdatedEvent> {
   readonly subject = BasPromoSubjects.BasPromoUpdated;
@@ -29,7 +30,9 @@ export class BasPromoUpdatedEventListener extends Listener<BasPromoUpdatedEvent>
       }
 
       if (updatedFields.name && updatedFields.name !== undefined) {
+        const slug = slugify(updatedFields.name, { lower: true, strict: true });
         promo.name = updatedFields.name;
+        promo.slug = slug;
       }
 
       if (updatedFields.startDate && updatedFields.startDate !== undefined) {
