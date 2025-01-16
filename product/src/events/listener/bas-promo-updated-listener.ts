@@ -29,10 +29,13 @@ export class BasPromoUpdatedEventListener extends Listener<BasPromoUpdatedEvent>
         throw new Error("Promo not found");
       }
 
+      if (!promo.slug) {
+        promo.slug = slugify(promo.name, { lower: true, strict: true });
+      }
+
       if (updatedFields.name && updatedFields.name !== undefined) {
-        const slug = slugify(updatedFields.name, { lower: true, strict: true });
         promo.name = updatedFields.name;
-        promo.slug = slug;
+        promo.slug = slugify(updatedFields.name, { lower: true, strict: true });
       }
 
       if (updatedFields.startDate && updatedFields.startDate !== undefined) {
