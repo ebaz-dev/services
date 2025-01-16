@@ -15,5 +15,6 @@ export interface BasProductRecievedEvent {
     barcode?: string;
     vendorId?: Types.ObjectId;
     splitSale?: boolean;
+    priority?: number;
   };
 }

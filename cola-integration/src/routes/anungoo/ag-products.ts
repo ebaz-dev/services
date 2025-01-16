@@ -49,6 +49,14 @@ router.get("/anungoo/product-list", async (req: Request, res: Response) => {
       throw new BadRequestError("No products from bas API.");
     }
 
+    basProducts.sort(
+      (a, b) => parseInt(a.position || "0") - parseInt(b.position || "0")
+    );
+
+    basProducts.forEach((item, index) => {
+      item.priority = index + 1;
+    });
+
     const existingProducts = await Product.find({
       customerId: { $in: [anungooPng[0]?._id, anungooIone[0]?._id] },
     });
@@ -100,6 +108,7 @@ router.get("/anungoo/product-list", async (req: Request, res: Response) => {
           barcode: sanitizedBarcode,
           business: item.business,
           splitSale: true,
+          priority: item.priority,
         };
 
         if (capacity !== 0) {
@@ -142,6 +151,10 @@ router.get("/anungoo/product-list", async (req: Request, res: Response) => {
 
         if (item.barCode !== sanitizedBarcode && sanitizedBarcode !== "") {
           updatedFields.barcode = sanitizedBarcode;
+        }
+
+        if (!item.priority || item.priority !== product.priority) {
+          updatedFields.priority = product.priority;
         }
 
         if (Object.keys(updatedFields).length > 0) {

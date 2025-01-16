@@ -1,9 +1,11 @@
-import mongoose  from "@ezdev/core/lib/mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 import { app } from "./app";
 import { natsWrapper } from "./nats-wrapper";
 import { InventoryCreatedListener } from "./events/listener/inventory-created-listener";
 import { BasProductRecievedEventListener } from "./events/listener/bas-product-recieved-listener";
 import { BasPromoRecievedEventListener } from "./events/listener/bas-promo-recieved-listener";
+import { BasProductUpdatedEventListener } from "./events/listener/bas-product-updated-listener";
+import { BasPromoUpdatedEventListener } from "./events/listener/bas-promo-updated-listener";
 
 const start = async () => {
   if (!process.env.PORT) {
@@ -56,6 +58,8 @@ const start = async () => {
     new InventoryCreatedListener(natsWrapper.client).listen();
     new BasProductRecievedEventListener(natsWrapper.client).listen();
     new BasPromoRecievedEventListener(natsWrapper.client).listen();
+    new BasProductUpdatedEventListener(natsWrapper.client).listen();
+    new BasPromoUpdatedEventListener(natsWrapper.client).listen();
 
     await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to DB");

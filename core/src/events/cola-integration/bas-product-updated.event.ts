@@ -13,6 +13,7 @@ export interface BasProductUpdatedEvent {
       incase?: number;
       barcode?: string;
       vendorId?: Types.ObjectId;
+      priority?: number;
     };
   };
 }
