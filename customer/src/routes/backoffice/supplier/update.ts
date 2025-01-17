@@ -5,6 +5,7 @@ import {
   CustomerDoc,
   Supplier,
   SupplierDoc,
+  requireAuth,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 import mongoose from "@ezdev/core/lib/mongoose";
@@ -14,13 +15,14 @@ const router = express.Router();
 
 router.put(
   "/supplier/:id",
+  requireAuth,
   validateRequest,
   async (req: Request, res: Response) => {
     const session = await mongoose.startSession();
     try {
       session.startTransaction();
 
-      await Supplier.updateOne(
+      const updatedSupplier = await Supplier.updateOne(
         { _id: req.params.id },
         <SupplierDoc>req.body
       ).session(session);
@@ -29,7 +31,7 @@ router.put(
         <CustomerDoc>req.body
       );
       await session.commitTransaction();
-      res.status(StatusCodes.OK).send();
+      res.status(StatusCodes.OK).send(updatedSupplier);
     } catch (error: any) {
       await session.abortTransaction();
       console.error("Customer update operation failed", error);
