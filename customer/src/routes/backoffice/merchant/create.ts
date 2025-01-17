@@ -8,6 +8,7 @@ import {
   Merchant,
   MerchantDoc,
   EmployeeRoles,
+  requireAuth,
 } from "@ezdev/core";
 import { body } from "express-validator";
 import { StatusCodes } from "http-status-codes";
@@ -21,6 +22,7 @@ const router = express.Router();
 router.post(
   "/merchant",
   [body("name").notEmpty().isString().withMessage("Name is required")],
+  requireAuth,
   validateRequest,
   async (req: Request, res: Response) => {
     const session = await mongoose.startSession();

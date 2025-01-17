@@ -1,11 +1,12 @@
 import express, { Request, Response } from "express";
-import { validateRequest, Merchant } from "@ezdev/core";
+import { validateRequest, Merchant, requireAuth } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 
 const router = express.Router();
 
 router.get(
   "/merchant/:id",
+  requireAuth,
   validateRequest,
   async (req: Request, res: Response) => {
     const merchant = await Merchant.findById(req.params.id as string)
