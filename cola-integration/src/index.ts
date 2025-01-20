@@ -140,9 +140,35 @@ const start = async () => {
         try {
           console.log("**************************************");
           console.log("Running cron job for anungoo promo list.");
-          await axios.get(
-            `http://localhost:3000/api/v1/integration/anungoo/promo-list`
-          );
+
+          let page = 0;
+          let hasMorePages = true;
+
+          while (hasMorePages) {
+            try {
+              const response = await axios.get(
+                `http://localhost:3000/api/v1/integration/anungoo/promo-list`,
+                { params: { page } }
+              );
+              if (response.data.status === "success") {
+                page++;
+                console.log("Anungoo promo list running at page:", page);
+              } else if (response.data.status === "finished") {
+                console.log("Finished processing promo list.");
+                break;
+              } else if (response.data.status === "failure") {
+                console.error("Failed to process promo list.");
+                break;
+              }
+            } catch (error) {
+              console.error(
+                `Error during scheduled job execution of promo list on page ${page}:`,
+                error
+              );
+              break;
+            }
+          }
+
           console.log("Promo list job executed successfully.");
         } catch (error) {
           console.error(

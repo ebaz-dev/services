@@ -5,8 +5,11 @@ export const arraysEqual = (a: any[], b: any[]): boolean => {
   if (a == null || b == null) return false;
   if (a.length !== b.length) return false;
 
-  for (let i = 0; i < a.length; ++i) {
-    if (a[i].toString() !== b[i].toString()) return false;
+  const aSorted = a.map((item) => item.toString()).sort();
+  const bSorted = b.map((item) => item.toString()).sort();
+
+  for (let i = 0; i < aSorted.length; ++i) {
+    if (aSorted[i] !== bSorted[i]) return false;
   }
   return true;
 };
