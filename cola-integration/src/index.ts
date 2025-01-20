@@ -91,6 +91,28 @@ const start = async () => {
     console.log("Connected to DB");
 
     cron.schedule(
+      "0 */6 * * *",
+      async () => {
+        try {
+          console.log("**************************************");
+          console.log("Running cron job for cola product-list.");
+          await axios.get(
+            `http://localhost:3000/api/v1/integration/cola/product-list`
+          );
+          console.log("Cola product-list job executed successfully.");
+        } catch (error) {
+          console.error(
+            "Error during scheduled job execution of cola product-list:",
+            error
+          );
+        }
+      },
+      {
+        timezone: "Asia/Ulaanbaatar",
+      }
+    );
+
+    cron.schedule(
       "0 */2 * * *",
       async () => {
         try {
@@ -117,14 +139,36 @@ const start = async () => {
       async () => {
         try {
           console.log("**************************************");
-          console.log("Running cron job for anungoo product list.");
+          console.log("Running cron job for anungoo product-list.");
           await axios.get(
             `http://localhost:3000/api/v1/integration/anungoo/product-list`
           );
-          console.log("Promo list job executed successfully.");
+          console.log("Anungoo product-list job executed successfully.");
         } catch (error) {
           console.error(
-            "Error during scheduled job execution of promo list:",
+            "Error during scheduled job execution of anungoo product-list:",
+            error
+          );
+        }
+      },
+      {
+        timezone: "Asia/Ulaanbaatar",
+      }
+    );
+
+    cron.schedule(
+      "0 */6 * * *",
+      async () => {
+        try {
+          console.log("**************************************");
+          console.log("Running cron job for marketgate product-list.");
+          await axios.get(
+            `http://localhost:3000/api/v1/integration/marketgate/product-list`
+          );
+          console.log("MarketGate product-list job executed successfully.");
+        } catch (error) {
+          console.error(
+            "Error during scheduled job execution of marketgate product-list:",
             error
           );
         }
@@ -139,7 +183,7 @@ const start = async () => {
       async () => {
         try {
           console.log("**************************************");
-          console.log("Running cron job for anungoo promo list.");
+          console.log("Running cron job for anungoo & marketgate promo-list.");
 
           let page = 0;
           let hasMorePages = true;
@@ -152,17 +196,24 @@ const start = async () => {
               );
               if (response.data.status === "success") {
                 page++;
-                console.log("Anungoo promo list running at page:", page);
+                console.log(
+                  "Anungoo & marketgate promo list running at page:",
+                  page
+                );
               } else if (response.data.status === "finished") {
-                console.log("Finished processing promo list.");
+                console.log(
+                  "Finished processing anungoo & marketgate promo-list."
+                );
                 break;
               } else if (response.data.status === "failure") {
-                console.error("Failed to process promo list.");
+                console.error(
+                  "Failed to process anungoo & marketgate promo-list."
+                );
                 break;
               }
             } catch (error) {
               console.error(
-                `Error during scheduled job execution of promo list on page ${page}:`,
+                `Error during scheduled job execution of anungoo & marketgate promo-list on page ${page}:`,
                 error
               );
               break;
@@ -172,51 +223,7 @@ const start = async () => {
           console.log("Promo list job executed successfully.");
         } catch (error) {
           console.error(
-            "Error during scheduled job execution of promo list:",
-            error
-          );
-        }
-      },
-      {
-        timezone: "Asia/Ulaanbaatar",
-      }
-    );
-
-    cron.schedule(
-      "30 6 * * *",
-      async () => {
-        try {
-          console.log("**************************************");
-          console.log("Running cron job for total product list.");
-          await axios.get(
-            `http://localhost:3000/api/v1/integration/marketgate/product-list`
-          );
-          console.log("Promo list job executed successfully.");
-        } catch (error) {
-          console.error(
-            "Error during scheduled job execution of promo list:",
-            error
-          );
-        }
-      },
-      {
-        timezone: "Asia/Ulaanbaatar",
-      }
-    );
-
-    cron.schedule(
-      "0 */2 * * *",
-      async () => {
-        try {
-          console.log("**************************************");
-          console.log("Running cron job for total promo list.");
-          await axios.get(
-            `http://localhost:3000/api/v1/integration/marketgate/promo-list`
-          );
-          console.log("Promo list job executed successfully.");
-        } catch (error) {
-          console.error(
-            "Error during scheduled job execution of promo list:",
+            "Error during scheduled job execution of promo-list:",
             error
           );
         }
