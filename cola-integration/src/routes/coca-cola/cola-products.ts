@@ -9,7 +9,7 @@ import {
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 import { natsWrapper } from "../../nats-wrapper";
-import { Types } from "mongoose";
+import { Types } from "@ezdev/core/lib/mongoose";
 import { BasProductRecievedEventPublisher } from "../../events/publisher/bas-product-recieved-publisher";
 import { BasProductUpdatedEventPublisher } from "../../events/publisher/bas-product-updated-publisher";
 import {
@@ -49,10 +49,11 @@ router.get("/cola/product-list", async (req: Request, res: Response) => {
 
     const existingEbProductsMap = existingEbProducts.reduce((map, item) => {
       if (item.thirdPartyData && Array.isArray(item.thirdPartyData)) {
-        const thirdPartyDataArray = item.thirdPartyData as ThirdPartyData[];
+        const thirdPartyDataArray = item.thirdPartyData as any[];
 
         const colaIntegrationData = thirdPartyDataArray.find(
-          (data: ThirdPartyData) => data?.customerId.equals(colaSupplierId)
+          (data: ThirdPartyData) =>
+            data?.customerId.toString() === colaSupplierId.toString()
         );
 
         if (colaIntegrationData) {

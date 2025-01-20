@@ -7,6 +7,7 @@ import {
   HoldingSupplierCodes,
   Merchant,
   Supplier,
+  requireAuth,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 import { Types } from "@ezdev/core/lib/mongoose";
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.get(
   "/merchant",
+  requireAuth,
   validateRequest,
   async (req: Request, res: Response) => {
     const filter: any = req.query.filter || {};

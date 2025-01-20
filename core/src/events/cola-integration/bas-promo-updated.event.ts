@@ -1,4 +1,4 @@
-import { Types, ObjectId } from "mongoose";
+import { Types, ObjectId } from "../../lib/mongoose";
 import { BasPromoSubjects } from "./bas-promo-event-subjects";
 
 export interface BasPromoUpdatedEvent {

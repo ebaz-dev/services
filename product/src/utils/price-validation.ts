@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose  from "@ezdev/core/lib/mongoose";
 import { ProductPrice, BadRequestError } from "@ezdev/core";
 
 export const validatePriceType = async (

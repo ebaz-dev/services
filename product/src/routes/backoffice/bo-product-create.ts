@@ -10,7 +10,7 @@ import {
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 import slugify from "slugify";
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 import { ProductCreatedPublisher } from "../../events/publisher/product-created-publisher";
 import { natsWrapper } from "../../nats-wrapper";
 
@@ -204,7 +204,7 @@ router.post(
         description: product.description || "",
         images: product.images || [],
         attributes: product.attributes,
-        prices: product.prices.map((price) => price.toString()),
+        prices: product.prices.map((price: any) => price.toString()),
         inCase: product.inCase,
         isActive: product.isActive,
         isAlcohol: product.isAlcohol ?? false,

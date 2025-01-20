@@ -11,27 +11,22 @@ import { IntegrationKeys } from "../../types/integration-keys";
 interface BannerDoc extends Document {
   file: string;
   type: number;
+  id: Types.ObjectId;
 }
-const bannerSchema = new Schema<BannerDoc>(
-  {
-    file: {
-      type: String,
-      required: true,
-    },
-    type: {
-      type: Number,
-      required: true,
-    },
+const bannerSchema = new Schema<BannerDoc>({
+  file: {
+    type: String,
+    required: true,
   },
-  {
-    toJSON: {
-      transform(doc, ret) {
-        ret.id = ret._id;
-        delete ret._id;
-      },
-    },
-  }
-);
+  type: {
+    type: Number,
+    required: true,
+  },
+  id: {
+    type: Schema.Types.ObjectId,
+    require: true,
+  },
+});
 
 interface BrandDoc extends Document {
   url: string;

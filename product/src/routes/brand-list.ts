@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { query } from "express-validator";
 import { StatusCodes } from "http-status-codes";
 import { validateRequest, requireAuth, Brand } from "@ezdev/core";
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 
 const router = express.Router();
 
@@ -38,7 +38,7 @@ router.get(
     try {
       const { ids, name, customerId, page = 1, limit = 10 } = req.query;
 
-      const filter: any = {};
+      const filter: any = { isDeleted: false, isActive: true };
 
       if (ids) {
         const idsArray = (ids as string).split(",").map((id) => id.trim());

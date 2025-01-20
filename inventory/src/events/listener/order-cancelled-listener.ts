@@ -8,7 +8,7 @@ import {
   OrderInventory,
 } from "@ezdev/core";
 import { queueGroupName } from "./queu-group-name";
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 
 export class OrderCancelledListener extends Listener<OrderCancelledEvent> {
   readonly subject = OrderEventSubjects.OrderCancelled;

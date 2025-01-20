@@ -9,7 +9,7 @@ import {
 } from "@ezdev/core";
 import { queueGroupName } from "./queu-group-name";
 import { ProductCreatedPublisher } from "../publisher/product-created-publisher";
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 import slugify from "slugify";
 import { natsWrapper } from "../../nats-wrapper";
 import { DefaultImage } from "../../utils/default-image";
@@ -39,6 +39,7 @@ export class BasProductRecievedEventListener extends Listener<BasProductRecieved
 
       const existingProduct = await Product.findOne({
         "thirdPartyData.productId": parseInt(basId),
+        customerId: supplierId,
       }).session(session);
 
       if (existingProduct) {
@@ -147,7 +148,7 @@ export class BasProductRecievedEventListener extends Listener<BasProductRecieved
         barCode: product.barCode,
         customerId: product.customerId.toString(),
         images: product.images || [],
-        prices: product.prices.map((price) => price.toString()),
+        prices: product.prices.map((price: any) => price.toString()),
         inCase: product.inCase,
         isActive: product.isActive,
       });

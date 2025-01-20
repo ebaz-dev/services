@@ -31,6 +31,23 @@ export * from "./models/access-log";
 
 export * from "./utils/bas-api-clients/integration-uri";
 
+// *Auth service
+// **Models
+export * from "./models/auth/user";
+export * from "./models/auth/user-device";
+
+// **Events
+export * from "./events/auth/auth-event-subjects";
+export * from "./events/auth/user-created-event";
+
+// **Types
+export * from "./types/device-types";
+
+// **Utils
+export * from "./utils/password";
+export * from "./utils/generate-confirmation-code";
+export * from "./utils/auth-constants";
+
 // *Order service
 // **Events
 export * from "./events/order/cart-event-subjects";
@@ -117,6 +134,10 @@ export * from "./utils/bas-api-clients/total-api-client";
 export * from "./utils/is-expired";
 export * from "./utils/merchant-payments";
 export * from "./utils/recognize-phone-number";
+export * from "./utils/bas-merchant-payments";
+export * from "./utils/bas-merchant-products/bas-client";
+export * from "./utils/bas-merchant-products/bas-merchant-products";
+export * from "./utils/bas-merchant-products/bas-product-match";
 
 // **Events
 export * from "./events/cola-integration/bas-product-event-subjects";

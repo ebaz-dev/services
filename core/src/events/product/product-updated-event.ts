@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { Types } from "../../lib/mongoose";
 import { ProductEventSubjects } from "./product-event-subjects";
 
 export interface ProductUpdatedEvent {

@@ -8,7 +8,7 @@ import {
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 import { natsWrapper } from "../../nats-wrapper";
-import { Types } from "mongoose";
+import { Types } from "@ezdev/core/lib/mongoose";
 import { BasProductRecievedEventPublisher } from "../../events/publisher/bas-product-recieved-publisher";
 import { BasProductUpdatedEventPublisher } from "../../events/publisher/bas-product-updated-publisher";
 import {
@@ -50,6 +50,14 @@ router.get("/marketgate/product-list", async (req: Request, res: Response) => {
     if (basProducts.length === 0) {
       throw new BadRequestError("No products from bas API.");
     }
+
+    basProducts.sort(
+      (a, b) => parseInt(a.position || "0") - parseInt(b.position || "0")
+    );
+
+    basProducts.forEach((item, index) => {
+      item.priority = index + 1;
+    });
 
     const existingProducts = await Product.find({
       customerId: { $in: [mgMgico[0]?._id, mgNestle[0]?._id] },
@@ -95,12 +103,12 @@ router.get("/marketgate/product-list", async (req: Request, res: Response) => {
           supplierId: supplierId as Types.ObjectId,
           basId: item.productid,
           productName: item.productname,
-          brandName: item.brandname,
           incase: item.incase,
           sectorName: item.sectorname,
           barcode: sanitizedBarcode,
           business: item.business,
           splitSale: true,
+          priority: item.priority,
         };
 
         if (capacity !== 0) {
@@ -133,10 +141,6 @@ router.get("/marketgate/product-list", async (req: Request, res: Response) => {
           updatedFields.productName = product.productname;
         }
 
-        if (!item.brandId) {
-          updatedFields.brandName = product.brandname;
-        }
-
         if (existingCapacity !== capacity && capacity !== 0) {
           updatedFields.capacity = capacity;
         }
@@ -147,6 +151,10 @@ router.get("/marketgate/product-list", async (req: Request, res: Response) => {
 
         if (item.barCode !== sanitizedBarcode && sanitizedBarcode !== "") {
           updatedFields.barcode = sanitizedBarcode;
+        }
+
+        if (!item.priority || item.priority !== product.priority) {
+          updatedFields.priority = product.priority;
         }
 
         if (Object.keys(updatedFields).length > 0) {

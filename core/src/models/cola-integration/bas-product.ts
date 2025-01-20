@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { ObjectId } from "../../lib/mongoose";
 
 interface BasProductData {
   productid: number;
@@ -12,6 +12,8 @@ interface BasProductData {
   incase: number;
   barcode: string;
   business?: string;
+  position?: string;
+  priority?: number;
 }
 
 interface ThirdPartyData {

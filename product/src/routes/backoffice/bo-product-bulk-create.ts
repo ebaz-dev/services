@@ -9,7 +9,7 @@ import {
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 import slugify from "slugify";
-import mongoose, { Types } from "mongoose";
+import mongoose, { Types } from "@ezdev/core/lib/mongoose";
 import { natsWrapper } from "../../nats-wrapper";
 
 const router = express.Router();
@@ -72,7 +72,7 @@ router.post(
 
     if (existingProducts.length > 0) {
       const existingProductNames = existingProducts.map(
-        (product) => product.name
+        (product: any) => product.name
       );
       return res.status(StatusCodes.BAD_REQUEST).send({
         message: "Some products already exist",

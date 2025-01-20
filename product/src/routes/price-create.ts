@@ -8,7 +8,7 @@ import {
   Product,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import mongoose from "mongoose";
+import mongoose  from "@ezdev/core/lib/mongoose";
 import { validatePriceType } from "../utils/price-validation";
 
 const router = express.Router();

@@ -1,4 +1,4 @@
-import { Document, Schema, model, Types } from "mongoose";
+import { Document, Schema, model, Types } from "../../lib/mongoose";
 
 interface VendorDoc extends Document {
   supplierId: Types.ObjectId;

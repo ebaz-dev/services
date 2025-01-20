@@ -1,4 +1,4 @@
-import { ObjectId } from "mongoose";
+import { ObjectId } from "@ezdev/core/lib/mongoose";
 
 export const matchProducts = async (
   thirdPartyProducts: number[],

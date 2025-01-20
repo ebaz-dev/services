@@ -1,4 +1,10 @@
-import mongoose, { Document, Schema, model, Types, Model } from "mongoose";
+import mongoose, {
+  Document,
+  Schema,
+  model,
+  Types,
+  Model,
+} from "../../lib/mongoose";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
 interface BrandDoc extends Document {
@@ -35,7 +41,7 @@ const brandSchema = new Schema<BrandDoc>(
     },
     image: {
       type: String,
-      required: true,
+      required: false,
     },
     isActive: {
       type: Boolean,

@@ -1,4 +1,4 @@
-import { Document, Schema, model, Types, Model } from "mongoose";
+import { Document, Schema, model, Types, Model } from "../../lib/mongoose";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 import { PromoTypeNames, PromoTypes } from "./promoType";
 

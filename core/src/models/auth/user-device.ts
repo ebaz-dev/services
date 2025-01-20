@@ -1,5 +1,5 @@
-import mongoose, { Document, Schema } from "@ezdev/core/lib/mongoose";
-import { DeviceTypes } from "../types/device-types";
+import mongoose, { Document, Schema } from "../../lib/mongoose";
+import { DeviceTypes } from "../../types/device-types";
 
 export interface UserDeviceDoc extends Document {
   userId: mongoose.Schema.Types.ObjectId;

@@ -9,7 +9,7 @@ import {
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 
-import mongoose, { FilterQuery } from "mongoose";
+import mongoose, { FilterQuery } from "@ezdev/core/lib/mongoose";
 
 const router = express.Router();
 
@@ -46,7 +46,7 @@ router.get(
         }).select("productId");
 
         if (activeProducts.length > 0) {
-          activeProductIds = activeProducts.map((ap) => ap.productId);
+          activeProductIds = activeProducts.map((ap: any) => ap.productId);
           query = { ...query, _id: { $in: activeProductIds } };
         }
       }

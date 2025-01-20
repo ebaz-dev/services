@@ -15,7 +15,7 @@ import {
 import { queueGroupName } from "./queu-group-name";
 import { CartInventoryChecked } from "../publisher/cart-inventory-checked-publisher";
 import { natsWrapper } from "../../nats-wrapper";
-import mongoose, { Types } from "mongoose";
+import mongoose, { Types } from "@ezdev/core/lib/mongoose";
 
 export class CartCreatedListener extends Listener<CartConfirmedEvent> {
   readonly subject = CartEventSubjects.CartConfirmed;
@@ -118,7 +118,7 @@ export class CartCreatedListener extends Listener<CartConfirmedEvent> {
           : [];
 
         const merchantProduct = merchantProducts.find(
-          (mp: any) => mp._id.toString() === item.id.toString()
+          (mp: any) => mp.id.toString() === item.id.toString()
         );
 
         if (

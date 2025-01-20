@@ -12,15 +12,28 @@ interface MerchantInfoResponse {
     trade_shop: {
       trade_shop_master_id: number;
       full_address: string;
-      province_city: string;
-      district_subcity: string;
-      sub_district_block: string;
+      province_city: {
+        id: string;
+        name: string;
+      };
+      district_subcity: {
+        id: string;
+        name: string;
+      };
+      sub_district_block: {
+        id: string;
+        name: string;
+      };
       coordinate: {
         longitude: number;
         latitude: number;
       };
       e_group_master: string;
     };
+    supplier: Array<{
+      supplier: string;
+      trade_shop_id: number;
+    }>;
   };
 }
 
@@ -30,12 +43,29 @@ export class HoldingAPIClient extends BaseAPIClient {
   private readonly PATH_PREFIX = "/api";
 
   constructor() {
+    const defaultExpirationMinutes = 60;
+
+    // Calculate expiration before super call
+    const expirationMinutes = (() => {
+      try {
+        const now = new Date();
+        now.setHours(now.getHours() + 8);
+        const targetDate = new Date("2024-11-28T11:55:57.557438+08:00");
+        const diffInMinutes =
+          (targetDate.getTime() - now.getTime()) / (1000 * 60);
+        return Math.floor(diffInMinutes) || defaultExpirationMinutes;
+      } catch (error) {
+        console.error("Error calculating expiration minutes:", error);
+        return defaultExpirationMinutes;
+      }
+    })();
+
     super(
       "https://merchant-verification-test-a6dba7hrezffecdw.southeastasia-01.azurewebsites.net",
       "/api/login",
       "ebazaar",
       "/IM3l)8Vs4K5",
-      30,
+      expirationMinutes,
       loginType.Basic,
       "auth_token"
     );

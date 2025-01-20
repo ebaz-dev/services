@@ -1,11 +1,12 @@
 import express, { Request, Response } from "express";
-import { validateRequest, Location } from "@ezdev/core";
+import { validateRequest, Location, requireAuth } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 
 const router = express.Router();
 
 router.get(
   "/location",
+  requireAuth,
   validateRequest,
   async (req: Request, res: Response) => {
     const criteria: any = {};

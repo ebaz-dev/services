@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 import { app } from "./app";
 import { natsWrapper } from "./nats-wrapper";
 import { OrderConfirmedListener } from "./events/listener/order-confirmed-listener";
@@ -91,18 +91,62 @@ const start = async () => {
     console.log("Connected to DB");
 
     cron.schedule(
-      "0 6 * * *",
+      "0 */2 * * *",
       async () => {
         try {
           console.log("**************************************");
-          console.log("Running the cron job of merchant products.");
+          console.log("Running cron job for cola promo list.");
           await axios.get(
-            `http://localhost:3000${apiPrefix}/merchant/product-list`
+            `http://localhost:3000/api/v1/integration/cola/promo-list`
           );
-          console.log("Merchant product list job executed successfully.");
+          console.log("Promo list job executed successfully.");
         } catch (error) {
           console.error(
-            "Error during scheduled job execution of merchant products:",
+            "Error during scheduled job execution of promo list:",
+            error
+          );
+        }
+      },
+      {
+        timezone: "Asia/Ulaanbaatar",
+      }
+    );
+
+    cron.schedule(
+      "0 */6 * * *",
+      async () => {
+        try {
+          console.log("**************************************");
+          console.log("Running cron job for anungoo product list.");
+          await axios.get(
+            `http://localhost:3000/api/v1/integration/anungoo/product-list`
+          );
+          console.log("Promo list job executed successfully.");
+        } catch (error) {
+          console.error(
+            "Error during scheduled job execution of promo list:",
+            error
+          );
+        }
+      },
+      {
+        timezone: "Asia/Ulaanbaatar",
+      }
+    );
+
+    cron.schedule(
+      "0 */2 * * *",
+      async () => {
+        try {
+          console.log("**************************************");
+          console.log("Running cron job for anungoo promo list.");
+          await axios.get(
+            `http://localhost:3000/api/v1/integration/anungoo/promo-list`
+          );
+          console.log("Promo list job executed successfully.");
+        } catch (error) {
+          console.error(
+            "Error during scheduled job execution of promo list:",
             error
           );
         }
@@ -117,8 +161,32 @@ const start = async () => {
       async () => {
         try {
           console.log("**************************************");
+          console.log("Running cron job for total product list.");
+          await axios.get(
+            `http://localhost:3000/api/v1/integration/marketgate/product-list`
+          );
+          console.log("Promo list job executed successfully.");
+        } catch (error) {
+          console.error(
+            "Error during scheduled job execution of promo list:",
+            error
+          );
+        }
+      },
+      {
+        timezone: "Asia/Ulaanbaatar",
+      }
+    );
+
+    cron.schedule(
+      "0 */2 * * *",
+      async () => {
+        try {
+          console.log("**************************************");
           console.log("Running cron job for total promo list.");
-          await axios.get(`http://localhost:3000${apiPrefix}/promo-list`);
+          await axios.get(
+            `http://localhost:3000/api/v1/integration/marketgate/promo-list`
+          );
           console.log("Promo list job executed successfully.");
         } catch (error) {
           console.error(

@@ -8,7 +8,7 @@ import {
 import { queueGroupName } from "./queu-group-name";
 import { InventoryCreatedPublisher } from "../publisher/inventory-created-publisher";
 import { natsWrapper } from "../../nats-wrapper";
-import mongoose from "mongoose";
+import mongoose from "@ezdev/core/lib/mongoose";
 
 export class ProductCreatedListener extends Listener<ProductCreatedEvent> {
   readonly subject = ProductEventSubjects.ProductCreated;

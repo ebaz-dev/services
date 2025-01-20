@@ -1,4 +1,4 @@
-import { Document, Schema, Types, model } from "mongoose";
+import { Document, Schema, Types, model } from "../../lib/mongoose";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 import { EmployeeRoles } from "../../types/employee-roles";
 

@@ -34,6 +34,7 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
         businessTypeId: new Types.ObjectId(),
       },
     });
+
   const products: any = [];
   let totalPrice = 0;
   cart.products.map(async (item, index) => {
@@ -132,6 +133,7 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
   // Processing promo products
   let giftProducts: any = [];
   let qualifiedPromos: any = [];
+
   promos = [
     ...new Map(
       promos.map((promo: any) => [
@@ -140,10 +142,12 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
       ])
     ).values(),
   ];
+
   promos.map((promo: any) => {
     if (promo) {
       let shouldQualify = false;
       let qualifiedPromo: any = false;
+
       qualifiedPromos.map((qPromo: any) => {
         if (
           promo.promoNo &&
@@ -157,7 +161,8 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
       if (promo.promoType === "x+y") {
         let includedQuantity = 0;
         products.map((product: any) => {
-          if (promo.products.indexOf(product.id) !== -1) {
+          // if (promo.products.indexOf(product.id) !== -1) {
+          if (promo.products.some((item: any) => item.equals(product.id))) {
             includedQuantity += product.quantity;
           }
         });
@@ -170,11 +175,14 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
         }
       } else if (promo.promoType === "z>x%") {
         let includedQuantity = 0;
+
         products.map((product: any) => {
-          if (promo.products.indexOf(product.id) !== -1) {
+          // if (promo.products.indexOf(product.id) !== -1) {
+          if (promo.products.some((item: any) => item.equals(product.id))) {
             includedQuantity += product.quantity;
           }
         });
+
         if (
           promo.thresholdQuantity <= includedQuantity &&
           (!qualifiedPromo ||
@@ -185,7 +193,8 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
       } else if (promo.promoType === "z>x") {
         let includedAmount = 0;
         products.map((product: any) => {
-          if (promo.products.indexOf(product.id) !== -1) {
+          // if (promo.products.indexOf(product.id) !== -1) {
+          if (promo.products.some((item: any) => item.equals(product.id))) {
             includedAmount += product.price * product.quantity;
           }
         });
@@ -199,7 +208,8 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
       } else if (promo.promoType === "Z$>x%") {
         let includedAmount = 0;
         products.map((product: any) => {
-          if (promo.products.indexOf(product.id) !== -1) {
+          // if (promo.products.indexOf(product.id) !== -1) {
+          if (promo.products.some((item: any) => item.equals(product.id))) {
             includedAmount += product.price * product.quantity;
           }
         });
@@ -213,11 +223,12 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
       }
       if (shouldQualify) {
         qualifiedPromos = qualifiedPromos.filter(
-          (item) =>
+          (item: any) =>
             !item.promoNo ||
             item.promoNo === "" ||
             item.promoNo !== promo.promoNo
         );
+
         qualifiedPromos.push(promo);
       }
     }
@@ -227,7 +238,8 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
       if (promo.promoType === "x+y") {
         let includedQuantity = 0;
         products.map((product: any) => {
-          if (promo.products.indexOf(product.id) !== -1) {
+          // if (promo.products.indexOf(product.id) !== -1) {
+          if (promo.products.some((item: any) => item.equals(product.id))) {
             includedQuantity += product.quantity;
           }
         });
@@ -242,7 +254,8 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
         });
       } else if (promo.promoType === "z>x%") {
         products.map((product: any) => {
-          if (promo.products.indexOf(product.id.toString()) !== -1) {
+          // if (promo.products.indexOf(product.id.toString()) !== -1) {
+          if (promo.products.some((item: any) => item.equals(product.id))) {
             const discount = (product.price / 100) * promo.promoPercent;
             product.price = product.price - discount;
             product.promoId = promo.thirdPartyData.thirdPartyPromoId;
@@ -259,7 +272,8 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
         });
       } else if (promo.promoType === "Z$>x%") {
         products.map((product: any) => {
-          if (promo.products.indexOf(product.id.toString()) !== -1) {
+          // if (promo.products.indexOf(product.id.toString()) !== -1) {
+          if (promo.products.some((item: any) => item.equals(product.id))) {
             const discount = (product.price / 100) * promo.promoPercent;
             product.price = product.price - discount;
             product.promoId = promo.thirdPartyData.thirdPartyPromoId;
@@ -268,7 +282,7 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
           return product;
         });
       }
-      delete promo.products;
+      // delete promo.products;
     }
   });
   products.map((product: any) => {

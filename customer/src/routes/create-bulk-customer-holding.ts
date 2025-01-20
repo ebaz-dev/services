@@ -3,6 +3,7 @@ import { BadRequestError, validateRequest, CustomerHolding } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
 import mongoose from "@ezdev/core/lib/mongoose";
 
+// deprecated
 const router = express.Router();
 
 router.post(

@@ -1,5 +1,5 @@
 import { BasProductSubjects } from "./bas-product-event-subjects";
-import { Types } from "mongoose";
+import { Types } from "../../lib/mongoose";
 
 export interface BasProductUpdatedEvent {
   subject: BasProductSubjects.BasProductUpdated;
@@ -13,6 +13,7 @@ export interface BasProductUpdatedEvent {
       incase?: number;
       barcode?: string;
       vendorId?: Types.ObjectId;
+      priority?: number;
     };
   };
 }

@@ -3,13 +3,13 @@ import { query } from "express-validator";
 import {
   validateRequest,
   requireAuth,
-  Promo,
   Product,
   ProductDoc,
   Merchant,
+  Supplier,
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import mongoose, { FilterQuery, Types } from "mongoose";
+import mongoose, { FilterQuery } from "@ezdev/core/lib/mongoose";
 
 const router = express.Router();
 const validOrderByFields = [
@@ -19,6 +19,8 @@ const validOrderByFields = [
   "promotion",
   "sizeIncreased",
   "sizeDecreased",
+  "ascending",
+  "descending",
 ];
 
 const totalCustomerId = "66f12d655e36613db5743430";
@@ -100,7 +102,7 @@ router.get(
       .isString()
       .custom((value) => validOrderByFields.includes(value.split(":")[0]))
       .withMessage(
-        "Order by must be one of the following: priority,favourite ,discount ,promotion ,sizeIncreased, sizeDecreased"
+        "Order by must be one of the following: priority,favourite ,discount ,promotion ,sizeIncreased, sizeDecreased, priceIncreased, priceDecreased"
       ),
     query("inCase")
       .optional()
@@ -142,8 +144,11 @@ router.get(
         promotion,
         favourite,
       } = req.query;
-      console.log("CHECK");
-      const query: FilterQuery<ProductDoc> = { isActive: true };
+
+      const query: FilterQuery<ProductDoc> = {
+        isActive: true,
+        isDeleted: false,
+      };
 
       if (name) query.name = { $regex: name, $options: "i" };
       if (barCode) query.barCode = { $regex: barCode, $options: "i" };
@@ -210,7 +215,10 @@ router.get(
         if (validOrderByFields.includes(key)) {
           if (key === "sizeIncreased" || key === "sizeDecreased") {
             const sizeOrder = key === "sizeIncreased" ? 1 : -1;
-            sort[`attributes.value`] = sizeOrder;
+            sort[`attribute.size`] = sizeOrder;
+          } else if (key === "ascending" || key === "descending") {
+            const priceOrder = key === "ascending" ? 1 : -1;
+            sort[`price`] = priceOrder;
           } else {
             sort[key] = order === "desc" ? -1 : 1;
           }
@@ -220,65 +228,30 @@ router.get(
       }
 
       const merchant = await Merchant.findById(merchantId as string);
-
-      if (promotion || discount) {
-        const currentDate = new Date();
-        const promoQuery: FilterQuery<any> = {
-          isActive: true,
-          startDate: { $lte: currentDate },
-          endDate: { $gte: currentDate },
-        };
-
-        let merchantTradeshopId: string | null = null;
-        const tradeShops = merchant?.tradeShops ?? [];
-
-        tradeShops.forEach((shop) => {
-          const { tsId, holdingKey } = shop;
-          if (customerId === totalCustomerId && holdingKey === "TD") {
-            merchantTradeshopId = tsId;
-          }
-
-          if (customerId === colaCustomerId && holdingKey === "MCSCC") {
-            merchantTradeshopId = tsId;
-          }
+      if (!merchant) {
+        return res.status(StatusCodes.NOT_FOUND).send({
+          message: "Merchant not found.",
         });
+      }
 
-        if (customerId)
-          promoQuery.customerId = new Types.ObjectId(query.customerId);
-        const promoConditions: FilterQuery<any>[] = [];
+      const supplier = await Supplier.findById(customerId as string);
+      if (!supplier) {
+        return res.status(StatusCodes.NOT_FOUND).send({
+          message: "Supplier not found.",
+        });
+      }
 
-        if (promotion) promoConditions.push({ promoTypeId: { $in: [1, 2] } });
+      const holdingKey = supplier?.holdingKey;
+      const tsId = merchant?.tradeShops?.find(
+        (shop) => shop.holdingKey === holdingKey
+      )?.tsId;
 
-        if (discount) promoConditions.push({ promoTypeId: { $in: [3] } });
+      if (promotion) {
+        query.promotion = true;
+      }
 
-        if (promoConditions.length > 0) {
-          promoQuery.$or = promoConditions;
-        }
-
-        if (merchantTradeshopId !== null) {
-          promoQuery.tradeshops = { $in: [parseInt(merchantTradeshopId)] };
-        }
-
-        const promos = await Promo.find(promoQuery).select("products");
-        const promoProductIds = promos.flatMap((promo) => promo.products);
-
-        if (promoProductIds.length === 0) {
-          const total = 0;
-          return res.status(StatusCodes.OK).send({
-            data: [],
-            total: 0,
-            totalPages: limit === "all" ? 1 : Math.ceil(total / limitNumber),
-            currentPage: limit === "all" ? 1 : pageNumber,
-          });
-        } else {
-          if (query._id) {
-            query._id = {
-              $in: [...promoProductIds, ...(query._id as any).$in],
-            };
-          } else {
-            query._id = { $in: promoProductIds };
-          }
-        }
+      if (discount) {
+        query.discount = true;
       }
 
       if (favourite && merchantId) {

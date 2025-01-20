@@ -1,6 +1,5 @@
-import { Notification, NotificationStatus } from "@ezdev/core";
+import { Notification, NotificationStatus, UserDevice } from "@ezdev/core";
 import * as admin from "firebase-admin";
-import { UserDevice } from "@ebazdev/auth";
 import { Types } from "@ezdev/core/lib/mongoose";
 
 interface NotificationPayload {

@@ -1,6 +1,5 @@
-import { Notification } from "@ezdev/core";
+import { Notification, UserDevice } from "@ezdev/core";
 import * as admin from "firebase-admin";
-import { UserDevice } from "@ebazdev/auth";
 
 export const sendNotifcation = async (payload: any) => {
   const notification = await Notification.create({
