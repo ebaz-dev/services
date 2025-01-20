@@ -17,7 +17,7 @@ const router = express.Router();
 
 router.get("/anungoo/promo-list", async (req: Request, res: Response) => {
   try {
-    const pageNumber = req.body.pageNumber || 0;
+    const page = parseInt(req.query.page as string, 10) || 0;
 
     const suppliers = await Supplier.find({
       type: "supplier",
@@ -51,7 +51,7 @@ router.get("/anungoo/promo-list", async (req: Request, res: Response) => {
 
     const promosResponse = await AnungooAPIClient.getClient().post(
       "/api/ebazaar/getdatapromo",
-      { pagenumber: pageNumber }
+      { pagenumber: page }
     );
 
     const promoData = promosResponse?.data || {};
@@ -128,11 +128,15 @@ router.get("/anungoo/promo-list", async (req: Request, res: Response) => {
 
     return res.status(StatusCodes.OK).send({ status: "success" });
   } catch (error: any) {
-    console.error("Bas integration Anungoo promo list get error:", error);
+    if (error.response.data.err_msg === "no data") {
+      return res.status(StatusCodes.OK).send({ status: "finished" });
+    } else {
+      console.error("Bas integration Anungoo promo list get error:", error);
 
-    return res.status(StatusCodes.BAD_REQUEST).send({
-      status: "failure",
-    });
+      return res.status(StatusCodes.BAD_REQUEST).send({
+        status: "failure",
+      });
+    }
   }
 });
 
