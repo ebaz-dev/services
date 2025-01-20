@@ -14,6 +14,7 @@ import { StatusCodes } from "http-status-codes";
 import mongoose from "@ezdev/core/lib/mongoose";
 import { getCustomerNumber } from "../utils/customer-number-generate";
 
+// deprecated
 const router = express.Router();
 
 router.post(

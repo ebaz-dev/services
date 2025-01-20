@@ -9,7 +9,7 @@ import { body } from "express-validator";
 import { HoldingAPIClient } from "../utils/HoldingApiClient";
 
 const router = express.Router();
-
+//deprecated
 router.post(
   "/merchant/holding/confirm",
   [
