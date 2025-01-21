@@ -13,8 +13,8 @@ import {
 } from "@ezdev/core";
 import { OrderConfirmedPublisher } from "../publisher/order-confirmed-publisher";
 import { natsWrapper } from "../../nats-wrapper";
-import { OrderCancelledPublisher } from "../publisher/order-cancelled-publisher";
 import { OrderDeliveredPublisher } from "../publisher/order-delivered-publisher";
+import { OrderReturnedPublisher } from "../publisher/order-returned-publisher";
 
 export class ColaOrderStatusReceivedListener extends Listener<ColaOrderStatusRecievedEvent> {
   readonly subject = ColaOrderStatusSubjects.OrderStatusRecieved;
@@ -38,14 +38,14 @@ export class ColaOrderStatusReceivedListener extends Listener<ColaOrderStatusRec
         });
         await new OrderConfirmedPublisher(natsWrapper.client).publish(order);
       } else if (status === colaOrderStatuses.cancelled) {
-        order.status = OrderStatus.Cancelled;
+        order.status = OrderStatus.Returned;
         await OrderLog.create({
           orderId: order.id,
           author: { name: "BAS" },
           type: OrderLogType.Status,
           action: OrderActions.Cancelled,
         });
-        await new OrderCancelledPublisher(natsWrapper.client).publish(order);
+        await new OrderReturnedPublisher(natsWrapper.client).publish(order);
       }
       if (status === colaOrderStatuses.delivered) {
         order.status = OrderStatus.Delivered;

@@ -32,6 +32,7 @@ import { orderBoListRouter } from "./routes/backoffice/list";
 import { orderBoGetRouter } from "./routes/backoffice/get";
 import { merchantDebtRouter } from "./routes/check-merchant-debt";
 import { orderReportRouter } from "./routes/backoffice/report";
+import { cartReorderRouter } from "./routes/cart-reorder";
 dotenv.config();
 
 const apiPrefix = "/api/v1/order";
@@ -71,6 +72,7 @@ app.use(apiPrefix, templateDeleteRouter);
 app.use(apiPrefix, templateGetRouter);
 app.use(apiPrefix, templateListRouter);
 app.use(apiPrefix, merchantDebtRouter);
+app.use(apiPrefix, cartReorderRouter);
 
 // backoffice
 app.use(backofficePrefix, orderBoListRouter);

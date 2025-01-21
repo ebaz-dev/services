@@ -3,5 +3,6 @@ export enum OrderEventSubjects {
   OrderConfirmed = "order:confirmed",
   OrderDelivered = "order:delivered",
   OrderCancelled = "order:cancelled",
+  OrderReturned = "order:returned",
   OrderPaymentMethodUpdated = "order:payment-method:updated",
 }

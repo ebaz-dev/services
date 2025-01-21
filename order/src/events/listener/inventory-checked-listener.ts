@@ -43,7 +43,7 @@ export class CartInventoryCheckedListener extends Listener<CartInventoryCheckedE
         );
 
         const order = await Order.create({
-          status: OrderStatus.Created,
+          status: cart.refOrderId ? OrderStatus.ReOrdered : OrderStatus.Created,
           supplierId: cart.supplierId,
           merchantId: cart.merchantId,
           userId: cart.userId,
@@ -78,6 +78,7 @@ export class CartInventoryCheckedListener extends Listener<CartInventoryCheckedE
             };
           }),
           tierDiscount: data.tierDiscount,
+          refOrderId: cart.refOrderId,
         });
         await OrderLog.create({
           orderId: order.id,

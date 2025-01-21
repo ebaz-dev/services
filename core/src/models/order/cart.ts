@@ -40,6 +40,7 @@ interface CartDoc extends Document {
   orderedAt: Date;
   deliveryDate: Date;
   returnedProducts?: string[];
+  refOrderId?: Types.ObjectId;
 }
 
 const cartSchema = new Schema<CartDoc>(
@@ -64,6 +65,11 @@ const cartSchema = new Schema<CartDoc>(
     orderedAt: Date,
     deliveryDate: Date,
     returnedProducts: [String],
+    refOrderId: {
+      type: Schema.Types.ObjectId,
+      required: false,
+      ref: "Order",
+    },
   },
   {
     timestamps: true,
