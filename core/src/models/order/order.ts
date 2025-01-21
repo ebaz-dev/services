@@ -7,6 +7,8 @@ export enum OrderStatus {
   Confirmed = "confirmed",
   Delivered = "delivered",
   Cancelled = "cancelled",
+  Returned = "returned",
+  ReOrdered = "reordered",
 }
 
 export enum PaymentMethods {
@@ -179,6 +181,7 @@ interface OrderDoc extends Document {
   tierDiscountPercent?: number;
   qualifiedPromos?: any[];
   tierDiscount?: any;
+  refOrderId?: Types.ObjectId;
 }
 
 const orderSchema = new Schema<OrderDoc>(
@@ -224,6 +227,11 @@ const orderSchema = new Schema<OrderDoc>(
     tierDiscountPercent: { type: Number, required: false, default: 0 },
     qualifiedPromos: [{ type: Object }],
     tierDiscount: Object,
+    refOrderId: {
+      type: Schema.Types.ObjectId,
+      required: false,
+      ref: "Order",
+    },
   },
   {
     timestamps: true,

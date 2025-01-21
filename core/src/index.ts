@@ -60,6 +60,7 @@ export * from "./events/order/order-confirm-event";
 export * from "./events/order/order-deliver-event";
 export * from "./events/order/order-cancel-event";
 export * from "./events/order/order-payment-method-update-event";
+export * from "./events/order/order-return-event";
 
 // **Models
 export * from "./models/order/cart";
