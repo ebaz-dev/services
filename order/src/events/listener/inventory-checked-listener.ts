@@ -43,7 +43,7 @@ export class CartInventoryCheckedListener extends Listener<CartInventoryCheckedE
         );
 
         const order = await Order.create({
-          status: cart.refOrderId ? OrderStatus.ReOrdered : OrderStatus.Created,
+          status: OrderStatus.Created,
           supplierId: cart.supplierId,
           merchantId: cart.merchantId,
           userId: cart.userId,
@@ -78,7 +78,6 @@ export class CartInventoryCheckedListener extends Listener<CartInventoryCheckedE
             };
           }),
           tierDiscount: data.tierDiscount,
-          refOrderId: cart.refOrderId,
         });
         await OrderLog.create({
           orderId: order.id,
@@ -88,6 +87,13 @@ export class CartInventoryCheckedListener extends Listener<CartInventoryCheckedE
         });
         cart.set({ status: CartStatus.Ordered, orderedAt: new Date() });
         await cart.save();
+        if (cart.refOrderId) {
+          await Order.updateOne(
+            { _id: cart.refOrderId },
+            { $set: { status: OrderStatus.ReOrdered } },
+            { upsert: true }
+          );
+        }
         await new OrderCreatedPublisher(natsWrapper.client).publish(order);
       } else if (status === "cancelled") {
         cart.set({

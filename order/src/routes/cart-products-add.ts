@@ -1,19 +1,17 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import { StatusCodes } from "http-status-codes";
-import mongoose, { Types } from "@ezdev/core/lib/mongoose";
-import { natsWrapper } from "../nats-wrapper";
+import { Types } from "@ezdev/core/lib/mongoose";
 import {
   BadRequestError,
   currentUser,
   requireAuth,
   validateRequest,
-  Cart,
-  CartDoc,
-  CartStatus,
+  Order,
+  CartProductDoc,
+  OrderTemplate,
 } from "@ezdev/core";
-import { CartProductAddedPublisher } from "../events/publisher/cart-product-added-publisher";
-import { migrateProducts } from "../utils/migrateProducts";
+import { cartProductsAdd } from "../utils/cart-products-add";
 
 const router = express.Router();
 
@@ -28,56 +26,51 @@ router.post(
       .notEmpty()
       .isString()
       .withMessage("Merchant ID is required"),
-    body("products").notEmpty().isArray().withMessage("Products are required"),
   ],
   currentUser,
   requireAuth,
   validateRequest,
   async (req: Request, res: Response) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    const userId = req.currentUser?.id;
     const data = req.body;
+    let products: CartProductDoc[] = [];
+    if (data.products) {
+      products = data.products;
+    } else if (data.refOrderId) {
+      const order = await Order.findOne({
+        _id: new Types.ObjectId(data.refOrderId as string),
+        supplierId: new Types.ObjectId(data.supplierId as string),
+      });
 
-    try {
-      let cart = await Cart.findOne({
-        supplierId: data.supplierId,
-        merchantId: data.merchantId,
-        userId: req.currentUser?.id,
-        status: {
-          $in: [CartStatus.Created, CartStatus.Pending, CartStatus.Returned],
-        },
-      }).session(session);
-      if (cart) {
-        if (cart.status === CartStatus.Pending) {
-          throw new Error("Processing cart to order!");
-        }
-        cart.products = data.products;
-        await cart.save();
-      } else {
-        cart = await Cart.create(<CartDoc>{
-          status: CartStatus.Created,
-          supplierId: data.supplierId,
-          merchantId: data.merchantId,
-          userId: new Types.ObjectId(req.currentUser?.id),
-          products: data.products,
-        });
+      if (!order) {
+        throw new BadRequestError("Ref Order not found!");
       }
 
-      await new CartProductAddedPublisher(natsWrapper.client).publish({
-        id: cart.id,
-        products: data.products,
-        updatedAt: new Date(),
+      products = order.products.map((product) => {
+        return <CartProductDoc>{ id: product.id, quantity: product.quantity };
       });
-      cart = await migrateProducts(cart);
-      await session.commitTransaction();
-      res.status(StatusCodes.OK).send({ data: cart });
-    } catch (error: any) {
-      await session.abortTransaction();
-      console.error("Product add operation failed", error);
-      throw new BadRequestError("product add operation failed");
-    } finally {
-      session.endSession();
+    } else if (data.templateId) {
+      const template = await OrderTemplate.findOne({
+        _id: new Types.ObjectId(data.templateId as string),
+        supplierId: new Types.ObjectId(data.supplierId as string),
+      });
+
+      if (!template) {
+        throw new BadRequestError("Ref template not found!");
+      }
+
+      products = template.products;
     }
+    const cart = await cartProductsAdd(
+      new Types.ObjectId(data.supplierId as string),
+      new Types.ObjectId(data.merchantId as string),
+      new Types.ObjectId(userId as string),
+      products,
+      data.clearCart || false,
+      new Types.ObjectId(data.refOrderId as string) || false
+    );
+
+    res.status(StatusCodes.OK).send({ data: cart });
   }
 );
 
