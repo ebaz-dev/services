@@ -356,5 +356,6 @@ export const migrateProducts = async (cart: CartDoc): Promise<any> => {
       tierDiscountAmount: Number(tierDiscountAmount.toFixed(2)),
       tierDiscountPercent,
     },
+    refOrderId: cart.refOrderId,
   };
 };
