@@ -73,6 +73,7 @@ router.get("/cola/promo-list", async (req: Request, res: Response) => {
 
       const existingPromo = await Promo.findOne({
         "thirdPartyData.thirdPartyPromoId": promo.promoid,
+        customerId: colaSupplierId,
       });
 
       if (existingPromo) {

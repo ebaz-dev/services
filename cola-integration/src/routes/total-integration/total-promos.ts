@@ -5,9 +5,10 @@ import {
   Supplier,
   basPromoMain,
   TotalAPIClient,
+  BadRequestError
 } from "@ezdev/core";
 import { StatusCodes } from "http-status-codes";
-import { ObjectId } from "@ezdev/core/lib/mongoose";
+import { Types } from "@ezdev/core/lib/mongoose";
 import { createPromoDataMaps } from "../../utils/promo-functions/generate-data-map";
 import { matchProducts } from "../../utils/promo-functions/match-products";
 import { checkAndUpdatePromo } from "../../utils/promo-functions/check-existing-promo";
@@ -17,20 +18,28 @@ const router = express.Router();
 
 router.get("/total/promo-list", async (req: Request, res: Response) => {
   try {
-    const supplier = await Supplier.findOne({
-      type: "supplier",
-      holdingKey: "TD",
-    }).select("_id vendorKey");
+    const { totalParent, totalParentId } = await getTotalParentSupplier();
 
-    if (!supplier) {
-      throw new Error("Supplier not found.");
+    const relatedSuppliers = await getRelatedSuppliers(totalParentId);
+    const { totalMainSuppliers, totalChilds } = categorizeSuppliers(relatedSuppliers);
+
+    const anungoo = findSupplier(totalMainSuppliers, "Anungoo");
+    const marketGate = findSupplier(totalMainSuppliers, "Market Gate");
+    const cola = findSupplier(totalMainSuppliers, "Coca Cola");
+
+    const anungooChilds = await getRelatedSuppliers(anungoo._id);
+    const marketGateChilds = await getRelatedSuppliers(marketGate._id);
+
+    const totalSuppliers = [...anungooChilds, ...totalChilds, ...marketGateChilds, cola];
+    const supplierIds = totalSuppliers.map((supplier) => supplier._id);
+
+
+    if (totalSuppliers.length === 0) {
+      throw new BadRequestError("Total suppliers not found.");
     }
 
-    const totalSupplierId = supplier?._id as ObjectId;
-
     const promosResponse = await TotalAPIClient.getClient().post(
-      "/api/ebazaar/getdatapromo",
-      {}
+      "/api/ebazaar/getdatapromo", {}
     );
 
     const promoData = promosResponse?.data || {};
@@ -41,8 +50,14 @@ router.get("/total/promo-list", async (req: Request, res: Response) => {
     }
 
     const ebProducts = await Product.find({
-      customerId: totalSupplierId,
+      customerId: {
+        $in: supplierIds,
+      },
     }).select("_id thirdPartyData customerId");
+
+    if (!ebProducts || ebProducts.length === 0) {
+      throw new Error("Total products not found.");
+    }
 
     const {
       basProductsMap,
@@ -71,29 +86,35 @@ router.get("/total/promo-list", async (req: Request, res: Response) => {
         ebProducts
       );
 
+      if (!promoSupplierId) {
+        console.error("Supplier not found for promo:", promo.promoid);
+        continue;
+      }
+
       const existingPromo = await Promo.findOne({
         "thirdPartyData.thirdPartyPromoId": promo.promoid,
+        customerId: promoSupplierId,
       });
 
       if (existingPromo) {
         await checkAndUpdatePromo(
           existingPromo,
           promo,
-          totalSupplierId,
+          promoSupplierId,
           ebProductIds,
           ebGiftProductIds
         );
       } else {
         await publishPromo(
           promo,
-          totalSupplierId,
+          promoSupplierId,
           ebProductIds,
           ebGiftProductIds
         );
       }
     }
 
-    return res.status(StatusCodes.OK).send({ status: "success" });
+    return res.status(StatusCodes.OK).send({ status: ebProducts });
   } catch (error: any) {
     console.error("Bas integration total promo list get error:", error);
 
@@ -102,5 +123,53 @@ router.get("/total/promo-list", async (req: Request, res: Response) => {
     });
   }
 });
+
+const getTotalParentSupplier = async () => {
+  const totalParent = await Supplier.findOne({
+    type: "supplier",
+    holdingKey: "TD",
+    parentId: { $exists: false },
+  }).select("business businessType");
+
+  if (!totalParent) {
+    throw new BadRequestError("Total parent supplier not found.");
+  }
+
+  const totalParentId = totalParent._id as Types.ObjectId;
+  return { totalParent, totalParentId };
+};
+
+const getRelatedSuppliers = async (parentId: Types.ObjectId) => {
+  const relatedSuppliers = await Supplier.find({ parentId }).select("business businessType");
+
+  if (!relatedSuppliers || relatedSuppliers.length === 0) {
+    throw new BadRequestError("Child suppliers not found.");
+  }
+
+  return relatedSuppliers;
+};
+
+const categorizeSuppliers = (relatedSuppliers: any[]) => {
+  const totalMainSuppliers: any[] = [];
+  const totalChilds: any[] = [];
+
+  for (const item of relatedSuppliers) {
+    if (item.business === "TotalDistribution") {
+      totalChilds.push(item);
+    } else {
+      totalMainSuppliers.push(item);
+    }
+  }
+
+  return { totalMainSuppliers, totalChilds };
+};
+
+const findSupplier = (suppliers: any[], businessName: string) => {
+  const supplier = suppliers.find((item) => item.business === businessName);
+  if (!supplier) {
+    throw new BadRequestError(`${businessName} supplier not found.`);
+  }
+  return supplier;
+};
 
 export { router as totalPromosRouter };

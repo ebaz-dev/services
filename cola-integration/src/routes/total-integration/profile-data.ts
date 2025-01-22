@@ -7,7 +7,6 @@ const router = express.Router();
 
 router.get("/total/profile-data", async (req: Request, res: Response) => {
   try {
-    console.log("Total profile data fetch started.");
     const { tradeshopId } = req.query;
     if (!tradeshopId) {
       return res.status(StatusCodes.BAD_REQUEST).send({

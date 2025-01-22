@@ -106,6 +106,7 @@ router.get("/anungoo/promo-list", async (req: Request, res: Response) => {
 
       const existingPromo = await Promo.findOne({
         "thirdPartyData.thirdPartyPromoId": promo.promoid,
+        customerId: promoSupplierId,
       });
 
       if (existingPromo) {
