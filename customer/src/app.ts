@@ -44,6 +44,7 @@ import { employeeGetRouter } from "./routes/employee/get";
 import { employeeMigrateRouter } from "./routes/employee/migrate";
 import { holdingSigninDataRouter } from "./routes/merchant-holding-data";
 import { holdingVerifyRouter } from "./routes/holding-verify";
+import { supplierListRouter } from "./routes/supplier/list";
 
 dotenv.config();
 
@@ -94,6 +95,7 @@ app.use(apiPrefix, employeeListRouter);
 app.use(apiPrefix, employeeMigrateRouter);
 app.use(apiPrefix, employeeGetRouter);
 app.use(apiPrefix, holdingVerifyRouter);
+app.use(apiPrefix, supplierListRouter);
 
 //backoffice
 app.use(backofficePrefix, boMerchantCreateRouter);

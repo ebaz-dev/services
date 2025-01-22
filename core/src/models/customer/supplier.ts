@@ -106,57 +106,80 @@ interface SupplierDoc extends CustomerDoc {
   brands: BrandDoc[];
   vendorKey?: VendorCodes;
   integrationKey?: IntegrationKeys;
-  business?: HoldingBusinessCodes;
-  businessType?: HoldingBusinessTypeCodes;
+  business?: string;
+  businessType?: string;
   appData?: any;
   promoBanners?: PromoBannerDoc[];
   orderScheduleTime?: string;
   termOfService: string;
   showOnHome: boolean;
+  linked: boolean;
+  refId: Types.ObjectId;
 }
-
-const Supplier = Customer.discriminator<SupplierDoc>(
-  "supplier",
-  new Schema({
-    orderMin: Number,
-    stockMin: Number,
+const supplierSchema = new Schema<SupplierDoc>(
+  {
+    orderMin: { type: Number, required: false },
+    stockMin: { type: Number, required: false },
     deliveryDays: { type: [Number], enum: [1, 2, 3, 4, 5, 6, 7] },
     holdingKey: { type: String, enum: Object.values(HoldingSupplierCodes) },
-    code: String,
-    banners: [bannerSchema],
-    productQuery: productQuerySchema,
-    productBanner: { type: String, require: false },
-    infoBanner: { type: String, require: false },
-    brands: [brandSchema],
+    code: { type: String },
+    banners: [bannerSchema], // Assuming bannerSchema is predefined
+    productQuery: productQuerySchema, // Assuming productQuerySchema is predefined
+    productBanner: { type: String, required: false },
+    infoBanner: { type: String, required: false },
+    brands: [brandSchema], // Assuming brandSchema is predefined
     vendorKey: {
       type: String,
       enum: Object.values(VendorCodes),
-      require: false,
+      required: false,
     },
     integrationKey: {
       type: String,
       enum: Object.values(IntegrationKeys),
-      require: false,
+      required: false,
     },
     business: {
       type: String,
-      enum: Object.values(HoldingBusinessCodes),
-      require: false,
+      required: false,
     },
     businessType: {
       type: String,
-      enum: Object.values(HoldingBusinessTypeCodes),
-      require: false,
+      required: false,
     },
-    appData: Object,
-    promoBanners: [promoBannerSchema],
-    orderScheduleTime: { type: String, require: false },
-    termOfService: {
-      type: String,
-      require: false,
+    appData: { type: Schema.Types.Mixed }, // Mixed allows for dynamic structure
+    promoBanners: [promoBannerSchema], // Assuming promoBannerSchema is predefined
+    orderScheduleTime: { type: String, required: false },
+    termOfService: { type: String, required: false },
+    showOnHome: { type: Boolean, required: false, default: false },
+    linked: { type: Boolean, required: false, default: false },
+    refId: {
+      type: Schema.Types.ObjectId,
+      ref: "Customer", // Reference the base model
+      required: false,
     },
-    showOnHome: { type: Boolean, require: false, default: false },
-  })
+  },
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+      },
+    },
+  }
+);
+
+supplierSchema.virtual("refSupplier", {
+  ref: "Customer",
+  localField: "refId",
+  foreignField: "_id",
+  justOne: true,
+});
+
+const Supplier = Customer.discriminator<SupplierDoc>(
+  "supplier",
+  supplierSchema
 );
 
 export { SupplierDoc, Supplier };

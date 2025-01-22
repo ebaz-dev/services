@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const getMerchantTierDiscount = async (
   tradeshopId: string,
-  type?: HoldingBusinessTypeCodes
+  type?: string
 ): Promise<any> => {
   try {
     const productsResponse = await AnungooAPIClient.getClient().post(
