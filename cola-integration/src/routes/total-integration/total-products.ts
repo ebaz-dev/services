@@ -21,6 +21,7 @@ const router = express.Router();
 
 router.get("/total/product-list", async (req: Request, res: Response) => {
   try {
+    console.log("Total product list fetch started.");
     const { totalParent, totalParentId } = await getTotalParentSupplier();
 
     const relatedSuppliers = await getRelatedSuppliers(totalParentId);
