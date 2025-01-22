@@ -14,7 +14,7 @@ spec:
     spec: 
       containers:
         - name: customer
-          image: 1stnano/customer:latest
+          image: tsendebna/customer:latest
           env:
             - name: MONGO_URI
               value: 'mongodb://ebaz-dev:774CPXo65J8i@103.229.178.56:27017/ebaz-dev?directConnection=true'
