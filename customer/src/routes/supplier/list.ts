@@ -75,7 +75,7 @@ router.get(
           showOnHome: refSupplier.showOnHome,
           linked: supplier.linked,
           refId: supplier.refId,
-          name: refSupplier.name,
+          name: supplier.name,
           regNo: refSupplier.regNo,
           category: refSupplier.category,
           address: refSupplier.address,
