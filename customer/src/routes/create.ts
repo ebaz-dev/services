@@ -47,6 +47,10 @@ router.post(
         data.customerNo = await getCustomerNumber(CustomerCode.Supplier);
         customer = new Supplier(<SupplierDoc>data);
       } else {
+        const existingMerchant = await Merchant.findOne({ regNo: data.regNo });
+        if (existingMerchant) {
+          throw new Error("regNo_already_registered");
+        }
         data.type = CustomerType.Merchant;
         data.customerNo = await getCustomerNumber(CustomerCode.Merchant);
         customer = new Merchant(<MerchantDoc>data);

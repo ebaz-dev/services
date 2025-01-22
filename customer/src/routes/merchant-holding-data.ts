@@ -6,6 +6,7 @@ import {
   CustomerHolding,
   HoldingSupplierCodes,
   Supplier,
+  Merchant,
 } from "@ezdev/core";
 import { query } from "express-validator";
 import { StatusCodes } from "http-status-codes";
@@ -27,6 +28,10 @@ router.get(
   validateRequest,
   async (req: Request, res: Response) => {
     const data = req.query;
+    const existingMerchant = await Merchant.findOne({ regNo: data.regNo });
+    if (existingMerchant) {
+      throw new Error("regNo_already_registered");
+    }
     const supplier = await Supplier.findById(data.supplierId);
     if (!supplier) {
       throw new Error("supplier_not_found");
