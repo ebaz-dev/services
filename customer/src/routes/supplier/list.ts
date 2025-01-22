@@ -67,14 +67,15 @@ router.get(
         const refSupplier = item.refSupplier;
         supplier = {
           id: supplier.id,
+          parentId: supplier.parentId,
           customerNo: supplier.customerNo,
           holdingKey: refSupplier.holdingKey,
           business: supplier.business,
           businessType: supplier.businessType,
-          showOnHome: supplier.showOnHome,
+          showOnHome: refSupplier.showOnHome,
           linked: supplier.linked,
           refId: supplier.refId,
-          name: refSupplier.name,
+          name: supplier.name,
           regNo: refSupplier.regNo,
           category: refSupplier.category,
           address: refSupplier.address,
