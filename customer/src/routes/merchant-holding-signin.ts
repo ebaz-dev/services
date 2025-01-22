@@ -40,6 +40,10 @@ router.post(
     const data = req.body;
 
     try {
+      const existingMerchant = await Merchant.findOne({ regNo: data.regNo });
+      if (existingMerchant) {
+        throw new Error("regNo_already_registered");
+      }
       const supplier = await Supplier.findById(data.supplierId);
       if (!supplier) {
         throw new Error("supplier_not_found");
