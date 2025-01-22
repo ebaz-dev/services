@@ -66,9 +66,9 @@ router.get("/anungoo/product-list", async (req: Request, res: Response) => {
         const basIntegrationData = item.thirdPartyData.find(
           (data: any) =>
             data?.customerId?.toString() ===
-              (anungooPng[0]?._id as Types.ObjectId).toString() ||
+            (anungooPng[0]?._id as Types.ObjectId).toString() ||
             data?.customerId?.toString() ===
-              (anungooIone[0]?._id as Types.ObjectId).toString()
+            (anungooIone[0]?._id as Types.ObjectId).toString()
         );
 
         if (basIntegrationData) {
@@ -143,10 +143,6 @@ router.get("/anungoo/product-list", async (req: Request, res: Response) => {
 
         if (existingCapacity !== capacity && capacity !== 0) {
           updatedFields.capacity = capacity;
-        }
-
-        if (item.inCase !== product.incase) {
-          updatedFields.incase = product.incase;
         }
 
         if (item.barCode !== sanitizedBarcode && sanitizedBarcode !== "") {

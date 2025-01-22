@@ -21,7 +21,6 @@ const router = express.Router();
 
 router.get("/total/product-list", async (req: Request, res: Response) => {
   try {
-    console.log("Total product list fetch started.");
     const { totalParent, totalParentId } = await getTotalParentSupplier();
 
     const relatedSuppliers = await getRelatedSuppliers(totalParentId);
@@ -182,17 +181,12 @@ const handleNewProducts = async (basNewProducts: BasProductData[], supplier: any
       sectorName: item.sectorname,
       business: item.business,
       barcode: sanitizedBarcode,
-      splitSale: true,
+      splitSale: supplier.business === "Coca Cola" ? false : true,
       priority: item.priority,
     };
 
     if (capacity !== 0) {
       eventPayload.capacity = capacity;
-    }
-
-    if (supplier.business === "Coca Cola") {
-      // eventPayload.brandName = item.brandname;
-      eventPayload.spilit = false
     }
 
     await new BasProductRecievedEventPublisher(natsWrapper.client).publish(eventPayload);
@@ -218,16 +212,12 @@ const handleExistingProducts = async (
         updatedFields.productName = product.productname;
       }
 
-      if (supplier.business === "Coca Cola" && !item.brandId) {
+      if (supplier.business === "Coca Cola" && !item.brandId && item.brandName !== product.brandname) {
         updatedFields.brandName = product.brandname;
       }
 
       if (existingCapacity !== capacity && capacity !== 0) {
         updatedFields.capacity = capacity;
-      }
-
-      if (item.inCase !== product.incase) {
-        updatedFields.incase = product.incase;
       }
 
       if (item.barCode !== sanitizedBarcode && sanitizedBarcode !== "") {
