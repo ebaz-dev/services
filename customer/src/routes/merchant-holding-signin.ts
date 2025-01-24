@@ -42,24 +42,24 @@ router.post(
     try {
       const existingMerchant = await Merchant.findOne({ regNo: data.regNo });
       if (existingMerchant) {
-        throw new Error("regNo_already_registered");
+        throw new BadRequestError("regNo_already_registered");
       }
       const supplier = await Supplier.findById(data.supplierId);
       if (!supplier) {
-        throw new Error("supplier_not_found");
+        throw new BadRequestError("supplier_not_found");
       }
       if (!supplier.holdingKey) {
-        throw new Error("supplier_holding_key_not_applied");
+        throw new BadRequestError("supplier_holding_key_not_applied");
       }
 
       const customerHolding = await CustomerHolding.findOne({
-        supplierId: data.supplierId,
+        holdingKey: supplier.holdingKey,
         tradeShopId: data.tsId,
         regNo: data.regNo,
       });
 
       if (!customerHolding) {
-        throw new Error("holding_customer_not_found");
+        throw new BadRequestError("holding_customer_not_found");
       }
       // if (customerHolding.merchantId) {
       //   throw new Error("holding_customer_synced_with_another_merchant");
