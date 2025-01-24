@@ -181,3 +181,11 @@ export * from "./events/payment/invoice-created-event";
 export * from "./events/payment/invoice-paid-event";
 
 // -------- Payment section ends here --------
+
+// -------- Promoted-items section starts here --------
+// **Models
+export * from "./models/marketing/promoted-items";
+
+// **Events
+
+// -------- Promoted-items section ends here --------
