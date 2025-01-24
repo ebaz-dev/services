@@ -1,6 +1,11 @@
 import express from "express";
 import "express-async-errors";
-import { errorHandler, NotFoundError } from "@ezdev/core";
+import {
+  errorHandler,
+  NotFoundError,
+  currentUser,
+  accessLogger,
+} from "@ezdev/core";
 import { healthRouter } from "./routes/health";
 import { json } from "body-parser";
 import cookieSession from "cookie-session";
@@ -25,6 +30,9 @@ app.use(
     secure: process.env.NODE_ENV !== "test",
   })
 );
+
+app.use(currentUser);
+// app.use(accessLogger("product"));
 
 app.use(apiPrefix, healthRouter);
 
