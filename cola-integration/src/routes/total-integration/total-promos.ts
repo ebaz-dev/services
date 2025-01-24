@@ -114,7 +114,7 @@ router.get("/total/promo-list", async (req: Request, res: Response) => {
       }
     }
 
-    return res.status(StatusCodes.OK).send({ status: ebProducts });
+    return res.status(StatusCodes.OK).send({ status: "success" });
   } catch (error: any) {
     console.error("Bas integration total promo list get error:", error);
 
