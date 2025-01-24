@@ -97,6 +97,8 @@ router.get(
           promoBanners: refSupplier.promoBanners,
           orderScheduleTime: refSupplier.orderScheduleTime,
           termOfService: refSupplier.termOfService,
+          cooperation: refSupplier.cooperation,
+          aboutCompany: refSupplier.aboutCompany,
         };
       }
       return supplier;

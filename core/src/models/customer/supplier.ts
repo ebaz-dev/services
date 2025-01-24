@@ -115,6 +115,8 @@ interface SupplierDoc extends CustomerDoc {
   showOnHome: boolean;
   linked: boolean;
   refId: Types.ObjectId;
+  cooperation: string;
+  aboutCompany: string;
 }
 const supplierSchema = new Schema<SupplierDoc>(
   {
@@ -155,6 +157,14 @@ const supplierSchema = new Schema<SupplierDoc>(
     refId: {
       type: Schema.Types.ObjectId,
       ref: "Customer", // Reference the base model
+      required: false,
+    },
+    cooperation: {
+      type: String,
+      required: false,
+    },
+    aboutCompany: {
+      type: String,
       required: false,
     },
   },
