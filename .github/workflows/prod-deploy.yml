@@ -41,63 +41,87 @@ jobs:
                 repo: repo
               });
               
-              // Find both automatic and manual deploy workflows
-              const devWorkflows = workflows.workflows.filter(w => 
-                w.path === '.github/workflows/dev-deploy.yml' || 
+              // First check manual deploy workflow
+              const manualWorkflow = workflows.workflows.find(w => 
                 w.path === '.github/workflows/dev-manual-deploy.yml'
               );
 
-              if (devWorkflows.length === 0) {
-                console.log('No deployment workflows found');
-                core.setOutput('services', '[]');
-                return;
-              }
-
               let deployedServices = [];
 
-              // Check each workflow for the specific SHA deployment
-              for (const workflow of devWorkflows) {
-                console.log(`Checking workflow: ${workflow.path}`);
-                
+              if (manualWorkflow) {
+                console.log('Checking manual workflow first');
                 const { data: runs } = await github.rest.actions.listWorkflowRuns({
                   owner: owner,
                   repo: repo,
-                  workflow_id: workflow.id,
+                  workflow_id: manualWorkflow.id,
                   status: 'completed',
                   conclusion: 'success'
                 });
-                
+
                 // Find the exact run with matching SHA
                 const matchingRun = runs.workflow_runs.find(run => 
                   run.head_sha === '${{ inputs.version }}'
                 );
-                
-                if (!matchingRun) {
-                  console.log(`No matching run found in ${workflow.path}`);
-                  continue;
+
+                if (matchingRun) {
+                  console.log('Found matching manual deployment run:', matchingRun.id);
+                  
+                  const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
+                    owner: owner,
+                    repo: repo,
+                    run_id: matchingRun.id
+                  });
+                  
+                  // Extract only the build-and-deploy jobs
+                  deployedServices = jobs.jobs
+                    .filter(job => job.name.includes('build-and-deploy'))
+                    .map(job => {
+                      const match = job.name.match(/build-and-deploy \(([^)]+)\)/);
+                      return match ? match[1].trim() : null;
+                    })
+                    .filter(Boolean);
                 }
+              }
 
-                console.log(`Found matching run in ${workflow.path}:`, matchingRun.id);
-                
-                const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
-                  owner: owner,
-                  repo: repo,
-                  run_id: matchingRun.id
-                });
-                
-                // Extract only the build-and-deploy jobs
-                const services = jobs.jobs
-                  .filter(job => job.name.includes('build-and-deploy'))
-                  .map(job => {
-                    const match = job.name.match(/build-and-deploy \(([^)]+)\)/);
-                    return match ? match[1].trim() : null;
-                  })
-                  .filter(Boolean);
+              // Only check automatic workflow if no manual deployment was found
+              if (deployedServices.length === 0) {
+                console.log('No manual deployment found, checking automatic workflow');
+                const autoWorkflow = workflows.workflows.find(w => 
+                  w.path === '.github/workflows/dev-deploy.yml'
+                );
 
-                if (services.length > 0) {
-                  deployedServices = services;
-                  console.log(`Found services to deploy from ${workflow.path}:`, services);
-                  break; // Stop after finding the first matching workflow run
+                if (autoWorkflow) {
+                  const { data: runs } = await github.rest.actions.listWorkflowRuns({
+                    owner: owner,
+                    repo: repo,
+                    workflow_id: autoWorkflow.id,
+                    status: 'completed',
+                    conclusion: 'success'
+                  });
+
+                  // Find the exact run with matching SHA
+                  const matchingRun = runs.workflow_runs.find(run => 
+                    run.head_sha === '${{ inputs.version }}'
+                  );
+
+                  if (matchingRun) {
+                    console.log('Found matching automatic deployment run:', matchingRun.id);
+                    
+                    const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
+                      owner: owner,
+                      repo: repo,
+                      run_id: matchingRun.id
+                    });
+                    
+                    // Extract only the build-and-deploy jobs
+                    deployedServices = jobs.jobs
+                      .filter(job => job.name.includes('build-and-deploy'))
+                      .map(job => {
+                        const match = job.name.match(/build-and-deploy \(([^)]+)\)/);
+                        return match ? match[1].trim() : null;
+                      })
+                      .filter(Boolean);
+                  }
                 }
               }
               
