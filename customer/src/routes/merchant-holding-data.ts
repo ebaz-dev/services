@@ -29,16 +29,31 @@ router.get(
   validateRequest,
   async (req: Request, res: Response) => {
     const data = req.query;
-    const existingMerchant = await Merchant.findOne({ regNo: data.regNo });
-    if (existingMerchant) {
-      throw new BadRequestError("regNo_already_registered");
-    }
     const supplier = await Supplier.findById(data.supplierId);
     if (!supplier) {
       throw new BadRequestError("supplier_not_found");
     }
     if (!supplier.holdingKey) {
       throw new BadRequestError("supplier_holding_key_not_applied");
+    }
+
+    const existingMerchant = await Merchant.findOne({
+      regNo: data.regNo,
+      tradeShops: {
+        $elemMatch: {
+          tsId: data.tsId,
+          holdingKey: supplier.holdingKey,
+        },
+      },
+    });
+
+    if (existingMerchant) {
+      res.status(StatusCodes.OK).send({
+        data: {
+          exists: true,
+          merchant: existingMerchant,
+        },
+      });
     }
 
     const customerHolding = await CustomerHolding.findOne({

@@ -59,7 +59,7 @@ router.post(
       const employee = new Employee({
         userId: req.currentUser?.id,
         customerId: customer.id,
-        role: EmployeeRoles.Admin,
+        role: EmployeeRoles.Owner,
       });
       await employee.save({ session });
       await new CustomerCreatedPublisher(natsWrapper.client).publish(customer);
