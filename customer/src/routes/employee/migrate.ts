@@ -75,7 +75,7 @@ router.get(
               const employee = await Employee.create({
                 userId: userId,
                 customerId: mainCustomer._id,
-                role: EmployeeRoles.Admin,
+                role: EmployeeRoles.Owner,
               });
               console.log("employee", employee);
             }

@@ -118,7 +118,7 @@ router.post(
       const employee = new Employee({
         userId: req.currentUser?.id,
         customerId: merchant.id,
-        role: EmployeeRoles.Admin,
+        role: EmployeeRoles.Owner,
       });
       await employee.save({ session });
 

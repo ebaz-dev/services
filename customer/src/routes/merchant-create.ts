@@ -26,7 +26,9 @@ router.post(
     try {
       session.startTransaction();
       const { business: businessData, branch: branchData } = req.body;
-      const existingMerchant = await Merchant.findOne({ regNo: businessData.regNo });
+      const existingMerchant = await Merchant.findOne({
+        regNo: businessData.regNo,
+      });
       if (existingMerchant) {
         throw new Error("regNo_already_registered");
       }
@@ -41,7 +43,7 @@ router.post(
       const employee = new Employee({
         userId: req.currentUser?.id,
         customerId: merchant.id,
-        role: EmployeeRoles.Admin,
+        role: EmployeeRoles.Owner,
       });
       await employee.save({ session });
       await session.commitTransaction();
