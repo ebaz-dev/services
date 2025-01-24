@@ -1,8 +1,10 @@
 import { Document, Schema, Types, model } from "../../lib/mongoose";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
+import { HoldingSupplierCodes } from "../../types/holding-supplier-codes";
 
 interface CustomerHoldingDoc extends Document {
   supplierId: Types.ObjectId;
+  holdingKey?: HoldingSupplierCodes;
   regNo: string;
   phone: string;
   tradeShopName: string;
@@ -24,6 +26,7 @@ const customerHoldingSchema = new Schema<CustomerHoldingDoc>(
       required: true,
       ref: "Customer",
     },
+    holdingKey: { type: String, enum: Object.values(HoldingSupplierCodes) },
     regNo: {
       type: String,
       required: false,
