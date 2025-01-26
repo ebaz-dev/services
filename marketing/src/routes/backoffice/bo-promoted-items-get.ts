@@ -13,7 +13,7 @@ const router = express.Router();
 
 // Route to get a promoted item by ID
 router.get(
-  "/promoted-items/:id",
+  "/bo/promoted-items/:id",
   [
     param("id")
       .custom((value) => mongoose.Types.ObjectId.isValid(value))

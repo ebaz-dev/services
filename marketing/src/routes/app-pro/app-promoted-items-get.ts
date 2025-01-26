@@ -11,9 +11,9 @@ import {
 
 const router = express.Router();
 
-// Route to delete a promoted item (set isDeleted to true)
-router.delete(
-  "/bo/promoted-items/:id",
+// Route to get a promoted item by ID
+router.get(
+  "/app/promoted-items/:id",
   [
     param("id")
       .custom((value) => mongoose.Types.ObjectId.isValid(value))
@@ -23,23 +23,15 @@ router.delete(
   validateRequest,
   async (req: Request, res: Response) => {
     const { id } = req.params;
-
-    // Find the promoted item by ID
-    const promotedItem = await PromotedItems.findById(id);
-
-    if (!promotedItem) {
-      throw new BadRequestError("Promoted item not found");
-    }
-
-    // Set isDeleted to true
-    promotedItem.isDeleted = true;
-
     try {
-      await promotedItem.save();
+      // Find the promoted item by ID
+      const promotedItem = await PromotedItems.findById(id);
 
-      res
-        .status(StatusCodes.OK)
-        .send({ status: "success", message: "Promoted item deleted" });
+      if (!promotedItem) {
+        throw new BadRequestError("Promoted item not found");
+      }
+
+      res.status(StatusCodes.OK).send(promotedItem);
     } catch (error: any) {
       console.error(error);
 
@@ -51,4 +43,4 @@ router.delete(
   }
 );
 
-export { router as boPromotedItemsDeleteRouter };
+export { router as appPromotedItemsGetRouter };

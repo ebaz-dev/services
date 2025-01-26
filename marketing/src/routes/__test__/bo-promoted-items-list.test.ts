@@ -1,7 +1,7 @@
 import request from "supertest";
 import { app } from "../../app";
 
-const apiPrefix = `/api/v1/marketing/promoted-items/list`;
+const apiPrefix = `/api/v1/marketing/bo/promoted-items/list`;
 
 describe("GET /promoted-items/list", () => {
   it("fails with 401 Unauthorized when no authentication is provided", async () => {
