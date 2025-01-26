@@ -8,13 +8,16 @@ import {
   requireAuth,
   PromotedItems,
   PromotedItemTypes,
+  Supplier,
+  Product,
+  Brand,
 } from "@ezdev/core";
 
 const router = express.Router();
 
 // Route to create a new promoted item
 router.post(
-  "/promoted-items",
+  "/bo/promoted-items",
   [
     body("supplierId")
       .notEmpty()
@@ -60,6 +63,23 @@ router.post(
   async (req: Request, res: Response) => {
     const { supplierId, type, itemId, startAt, endAt, isActive, priority } =
       req.body;
+
+    // Check if the supplier exists
+    const supplier = await Supplier.findById(supplierId);
+    if (!supplier) {
+      throw new BadRequestError("Supplier not found");
+    }
+
+    // Check if the item exists
+    const item =
+      type === PromotedItemTypes.Product
+        ? await Product.findOne({ _id: itemId, customerId: supplierId })
+        : type === PromotedItemTypes.Brand
+        ? await Brand.findOne({ _id: itemId, customerId: supplierId })
+        : null;
+    if (!item) {
+      throw new BadRequestError("Item not found");
+    }
 
     // Check if the promoted item already exists
     const existingItem = await PromotedItems.findOne({

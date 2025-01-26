@@ -8,13 +8,16 @@ import {
   requireAuth,
   PromotedItems,
   PromotedItemTypes,
+  Supplier,
+  Product,
+  Brand,
 } from "@ezdev/core";
 
 const router = express.Router();
 
 // Route to update a promoted item by ID
 router.put(
-  "/promoted-items/:id",
+  "/bo/promoted-items/:id",
   [
     param("id")
       .custom((value) => mongoose.Types.ObjectId.isValid(value))
@@ -63,6 +66,30 @@ router.put(
 
       if (!promotedItem) {
         throw new BadRequestError("Promoted item not found");
+      }
+
+      if (updateData.itemId || updateData.type || updateData.supplierId) {
+        if (updateData.supplierId) {
+          const supplier = await Supplier.findById(updateData.supplierId);
+          if (!supplier) {
+            throw new BadRequestError("Supplier not found");
+          }
+        }
+
+        const type = updateData.type || promotedItem.type;
+        const supplierId = updateData.supplierId || promotedItem.supplierId;
+        const itemId = updateData.itemId || promotedItem.itemId;
+
+        const item =
+          type === PromotedItemTypes.Product
+            ? await Product.findOne({ _id: itemId, customerId: supplierId })
+            : type === PromotedItemTypes.Brand
+            ? await Brand.findOne({ _id: itemId, customerId: supplierId })
+            : null;
+
+        if (!item) {
+          throw new BadRequestError("Item not found");
+        }
       }
 
       // Update the promoted item with the new data

@@ -17,6 +17,9 @@ import { boPromotedItemsGetRouter } from "./routes/backoffice/bo-promoted-items-
 import { boPromotedItemsListRouter } from "./routes/backoffice/bo-promoted-items-list";
 import { boPromotedItemsUpdateRouter } from "./routes/backoffice/bo-promoted-items-update";
 
+import { appPromotedItemsListRouter } from "./routes/app-pro/app-promoted-items-list";
+import { appPromotedItemsGetRouter } from "./routes/app-pro/app-promoted-items-get";
+
 dotenv.config();
 
 const apiPrefix = "/api/v1/marketing";
@@ -32,15 +35,20 @@ app.use(
 );
 
 app.use(currentUser);
-// app.use(accessLogger("product"));
+// app.use(accessLogger("marketing"));
 
 app.use(apiPrefix, healthRouter);
 
+// Backoffice routes
 app.use(apiPrefix, boPromotedItemsCreateRouter);
 app.use(apiPrefix, boPromotedItemsDeleteRouter);
 app.use(apiPrefix, boPromotedItemsListRouter);
 app.use(apiPrefix, boPromotedItemsGetRouter);
 app.use(apiPrefix, boPromotedItemsUpdateRouter);
+
+// Merchant app pro routes
+app.use(apiPrefix, appPromotedItemsListRouter);
+app.use(apiPrefix, appPromotedItemsGetRouter);
 
 app.all("*", async () => {
   throw new NotFoundError();

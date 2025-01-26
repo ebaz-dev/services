@@ -8,7 +8,7 @@ const router = express.Router();
 
 // Route to get a list of promoted items
 router.get(
-  "/bo/promoted-items/list",
+  "/app/promoted-items/list",
   [
     query("supplierId")
       .optional()
@@ -76,4 +76,4 @@ router.get(
   }
 );
 
-export { router as boPromotedItemsListRouter };
+export { router as appPromotedItemsListRouter };
