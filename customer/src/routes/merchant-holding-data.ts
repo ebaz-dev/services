@@ -119,7 +119,7 @@ router.get(
     };
 
     res.status(StatusCodes.OK).send({
-      data: merchant,
+      data: { exists: false, merchant },
     });
   }
 );
