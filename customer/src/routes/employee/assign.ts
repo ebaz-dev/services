@@ -34,11 +34,11 @@ router.post(
       const user = await User.findById(userId);
       const customer = await Customer.findById(customerId);
       if (!user || !customer) {
-        throw new Error("Customer or User not found");
+        throw new BadRequestError("Customer or User not found");
       }
       const employeeExist = await Employee.find({ userId, customerId });
       if (employeeExist.length > 0) {
-        throw new Error("Employee already assigned");
+        throw new BadRequestError("Employee already assigned");
       }
 
       const newEmployee = new Employee({
@@ -52,7 +52,7 @@ router.post(
     } catch (error: any) {
       await session.abortTransaction();
       console.error("Employee create operation failed", error);
-      throw new BadRequestError("Employee create operation failed");
+      throw new BadRequestError(error.message);
     } finally {
       session.endSession();
     }

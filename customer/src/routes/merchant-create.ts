@@ -30,7 +30,7 @@ router.post(
         regNo: businessData.regNo,
       });
       if (existingMerchant) {
-        throw new Error("regNo_already_registered");
+        throw new BadRequestError("regNo_already_registered");
       }
       businessData.userId = req.currentUser?.id;
       branchData.userId = req.currentUser?.id;
@@ -58,7 +58,7 @@ router.post(
     } catch (error: any) {
       await session.abortTransaction();
       console.error("Merchant create operation failed", error);
-      throw new BadRequestError("Mercchant create operation failed");
+      throw new BadRequestError(error.message);
     } finally {
       session.endSession();
     }

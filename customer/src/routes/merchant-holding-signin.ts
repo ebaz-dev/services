@@ -71,6 +71,7 @@ router.post(
         {
           holdingKey: supplier.holdingKey,
           tsId: customerHolding.tradeShopId,
+          channel: customerHolding.team,
         },
       ];
 
@@ -78,16 +79,19 @@ router.post(
         tradeShops.push({
           holdingKey: HoldingSupplierCodes.CocaCola,
           tsId: customerHolding.tradeShopId,
+          channel: customerHolding.team,
         });
 
         tradeShops.push({
           holdingKey: HoldingSupplierCodes.AnunGoo,
           tsId: customerHolding.tradeShopId,
+          channel: customerHolding.team,
         });
 
         tradeShops.push({
           holdingKey: HoldingSupplierCodes.MarketGate,
           tsId: customerHolding.tradeShopId,
+          channel: customerHolding.team,
         });
       }
 
@@ -95,12 +99,14 @@ router.post(
         tradeShops.push({
           holdingKey: HoldingSupplierCodes.MarketGate,
           tsId: customerHolding.tradeShopId,
+          channel: customerHolding.team,
         });
       }
       if (supplier.holdingKey === HoldingSupplierCodes.MarketGate) {
         tradeShops.push({
           holdingKey: HoldingSupplierCodes.AnunGoo,
           tsId: customerHolding.tradeShopId,
+          channel: customerHolding.team,
         });
       }
 

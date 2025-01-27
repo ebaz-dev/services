@@ -45,7 +45,7 @@ router.post(
     } catch (error: any) {
       await session.abortTransaction();
       console.error("Customer create operation failed", error);
-      throw new BadRequestError("Customer create operation failed");
+      throw new BadRequestError(error.message);
     } finally {
       session.endSession();
     }

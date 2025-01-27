@@ -22,7 +22,7 @@ router.post(
     } catch (error: any) {
       await session.abortTransaction();
       console.error("Location create operation failed", error);
-      throw new BadRequestError("Location create operation failed");
+      throw new BadRequestError(error.message);
     } finally {
       session.endSession();
     }
