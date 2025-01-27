@@ -17,8 +17,8 @@ import { boPromotedItemsGetRouter } from "./routes/backoffice/bo-promoted-items-
 import { boPromotedItemsListRouter } from "./routes/backoffice/bo-promoted-items-list";
 import { boPromotedItemsUpdateRouter } from "./routes/backoffice/bo-promoted-items-update";
 
-import { appPromotedItemsListRouter } from "./routes/app-pro/app-promoted-items-list";
 import { appPromotedItemsGetRouter } from "./routes/app-pro/app-promoted-items-get";
+import { appPromotedItemsListRouter } from "./routes/app-pro/app-promoted-items-list";
 
 dotenv.config();
 
