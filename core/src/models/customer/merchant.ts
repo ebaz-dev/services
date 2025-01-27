@@ -5,6 +5,7 @@ import { HoldingSupplierCodes } from "../../types/holding-supplier-codes";
 interface tradeShop {
   tsId: string;
   holdingKey: HoldingSupplierCodes;
+  channel?: string;
 }
 interface MerchantDoc extends CustomerDoc {
   businessName: string;
@@ -31,6 +32,7 @@ const Merchant = Customer.discriminator<MerchantDoc>(
           type: String,
           enum: Object.values(HoldingSupplierCodes),
         },
+        channel: { type: String, require: false },
       },
     ],
     test: { type: Boolean, default: false },

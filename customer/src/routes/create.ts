@@ -49,7 +49,7 @@ router.post(
       } else {
         const existingMerchant = await Merchant.findOne({ regNo: data.regNo });
         if (existingMerchant) {
-          throw new Error("regNo_already_registered");
+          throw new BadRequestError("regNo_already_registered");
         }
         data.type = CustomerType.Merchant;
         data.customerNo = await getCustomerNumber(CustomerCode.Merchant);
@@ -68,7 +68,7 @@ router.post(
     } catch (error: any) {
       await session.abortTransaction();
       console.error("Customer create operation failed", error);
-      throw new BadRequestError("Customer create operation failed");
+      throw new BadRequestError(error.message);
     } finally {
       session.endSession();
     }

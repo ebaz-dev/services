@@ -93,6 +93,24 @@ const promoBannerSchema = new Schema<PromoBannerDoc>(
   }
 );
 
+interface ChannelDoc extends Document {
+  key: string;
+  orderMin: number;
+}
+const channelSchema = new Schema<ChannelDoc>(
+  {
+    key: {
+      type: String,
+      required: true,
+    },
+    orderMin: {
+      type: Number,
+      require: true,
+    },
+  },
+  { _id: false }
+);
+
 interface SupplierDoc extends CustomerDoc {
   orderMin: number;
   stockMin: number;
@@ -117,6 +135,7 @@ interface SupplierDoc extends CustomerDoc {
   refId: Types.ObjectId;
   cooperation: string;
   aboutCompany: string;
+  channels?: ChannelDoc[];
 }
 const supplierSchema = new Schema<SupplierDoc>(
   {
@@ -167,6 +186,7 @@ const supplierSchema = new Schema<SupplierDoc>(
       type: String,
       required: false,
     },
+    channels: [channelSchema],
   },
   {
     timestamps: true,

@@ -35,7 +35,7 @@ router.put(
     } catch (error: any) {
       await session.abortTransaction();
       console.error("Customer update operation failed", error);
-      throw new BadRequestError("Customer update operation failed");
+      throw new BadRequestError(error.message);
     } finally {
       session.endSession();
     }

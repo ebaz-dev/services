@@ -63,7 +63,7 @@ router.post(
     } catch (error: any) {
       await session.abortTransaction();
       console.error("Update holding code operation failed", error);
-      throw new BadRequestError("Update holding code operation failed");
+      throw new BadRequestError(error.message);
     } finally {
       session.endSession();
     }
