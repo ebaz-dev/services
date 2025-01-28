@@ -26,12 +26,6 @@ router.post(
     try {
       session.startTransaction();
       const { business: businessData, branch: branchData } = req.body;
-      const existingMerchant = await Merchant.findOne({
-        regNo: businessData.regNo,
-      });
-      if (existingMerchant) {
-        throw new BadRequestError("regNo_already_registered");
-      }
       businessData.userId = req.currentUser?.id;
       branchData.userId = req.currentUser?.id;
       const insertData = <MerchantDoc>branchData;
