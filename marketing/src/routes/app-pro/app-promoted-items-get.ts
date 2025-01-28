@@ -25,7 +25,11 @@ router.get(
     const { id } = req.params;
     try {
       // Find the promoted item by ID
-      const promotedItem = await PromotedItems.findById(id);
+      const promotedItem = await PromotedItems.findOne({
+        _id: id,
+        isActive: true,
+        isDeleted: false,
+      });
 
       if (!promotedItem) {
         throw new BadRequestError("Promoted item not found");
