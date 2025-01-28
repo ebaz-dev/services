@@ -35,6 +35,7 @@ router.put(
       .optional()
       .custom((value) => mongoose.Types.ObjectId.isValid(value))
       .withMessage("Item ID must be a valid ObjectId"),
+    body("image").optional().isString().withMessage("Images must be a string"),
     body("startAt")
       .optional()
       .isISO8601()
@@ -62,7 +63,10 @@ router.put(
 
     try {
       // Find the promoted item by ID
-      const promotedItem = await PromotedItems.findById(id);
+      const promotedItem = await PromotedItems.findOne({
+        _id: id,
+        isDeleted: false,
+      });
 
       if (!promotedItem) {
         throw new BadRequestError("Promoted item not found");

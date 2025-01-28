@@ -35,6 +35,11 @@ router.post(
       .withMessage("Item ID is required")
       .custom((value) => mongoose.Types.ObjectId.isValid(value))
       .withMessage("Item ID must be a valid ObjectId"),
+    body("image")
+      .notEmpty()
+      .withMessage("Images are required")
+      .isString()
+      .withMessage("Images must be a string"),
     body("startAt")
       .notEmpty()
       .withMessage("Start date is required")
@@ -61,8 +66,16 @@ router.post(
   requireAuth,
   validateRequest,
   async (req: Request, res: Response) => {
-    const { supplierId, type, itemId, startAt, endAt, isActive, priority } =
-      req.body;
+    const {
+      supplierId,
+      type,
+      itemId,
+      image,
+      startAt,
+      endAt,
+      isActive,
+      priority,
+    } = req.body;
 
     // Check if the supplier exists
     const supplier = await Supplier.findById(supplierId);

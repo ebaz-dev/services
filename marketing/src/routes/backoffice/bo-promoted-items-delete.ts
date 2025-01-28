@@ -31,6 +31,10 @@ router.delete(
       throw new BadRequestError("Promoted item not found");
     }
 
+    if (promotedItem.isDeleted) {
+      throw new BadRequestError("Promoted item already deleted");
+    }
+
     // Set isDeleted to true
     promotedItem.isDeleted = true;
 

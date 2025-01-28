@@ -16,6 +16,7 @@ interface PromotedItemAttrs {
   supplierId: Types.ObjectId;
   type: PromotedItemTypes;
   itemId: Types.ObjectId;
+  image: string;
   startAt: Date;
   endAt: Date;
   isActive: boolean;
@@ -28,6 +29,7 @@ interface PromotedItemsDoc extends Document {
   supplierId: Types.ObjectId;
   type: PromotedItemTypes;
   itemId: Types.ObjectId;
+  image: string;
   startAt: Date;
   endAt: Date;
   isActive: boolean;
@@ -52,6 +54,10 @@ const promotedItemsSchema = new Schema<PromotedItemsDoc>(
     },
     itemId: {
       type: Schema.Types.ObjectId,
+      required: true,
+    },
+    image: {
+      type: String,
       required: true,
     },
     startAt: {

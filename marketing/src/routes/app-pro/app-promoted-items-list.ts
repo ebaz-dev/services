@@ -37,7 +37,7 @@ router.get(
     const limitNumber = limit === "all" ? 0 : parseInt(limit as string, 10);
 
     // Build the query object
-    const queryObj: any = { isDeleted: false };
+    const queryObj: any = { isDeleted: false, isActive: true };
     if (supplierId) queryObj.supplierId = supplierId;
     if (type) queryObj.type = type;
     if (isActive !== undefined) queryObj.isActive = isActive === "true";
