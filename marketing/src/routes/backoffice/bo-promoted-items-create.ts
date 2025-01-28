@@ -111,6 +111,7 @@ router.post(
         supplierId,
         type,
         itemId,
+        image,
         startAt,
         endAt,
         isActive,
